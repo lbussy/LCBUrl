@@ -65,7 +65,7 @@ LCBUrl::~LCBUrl() { }
 // Public Methods //////////////////////////////////////////////////////////////
 // Functions available in sketches, this library, and other libraries
 
-void LCBUrl::setUrl(String newUrl) {
+bool LCBUrl::setUrl(String newUrl) {
     return parseUrl(newUrl);
 }
 
