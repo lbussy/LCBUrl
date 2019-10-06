@@ -116,7 +116,7 @@ bool LCBUrl::parseUrl(String newUrl) {
     userinfo = "lbussy"; // Do not normalize, may include :password
     host = "b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io"; // Normalize to lowercase
     port = 80;
-    path = "status";
+    path = "/status"; // Make sure this has a leading slash
     query="";
     fragment = "";
     return true; // Validate URL was able to be parsed
