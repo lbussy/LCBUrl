@@ -34,7 +34,7 @@ class LCBUrl {
     public:
         LCBUrl();
         ~LCBUrl();
-        void setUrl(String);
+        bool setUrl(String);
         String getUrl();
         String getScheme();
         String getAuthority();
@@ -47,7 +47,7 @@ class LCBUrl {
 
     // Library-accessible "private" interface
     private:
-        void parseUrl(String);
+        bool parseUrl(String);
         String url;
         String scheme;
         String authority;

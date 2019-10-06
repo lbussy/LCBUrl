@@ -66,7 +66,7 @@ LCBUrl::~LCBUrl() { }
 // Functions available in sketches, this library, and other libraries
 
 void LCBUrl::setUrl(String newUrl) {
-    parseUrl(newUrl);
+    return parseUrl(newUrl);
 }
 
 String LCBUrl::getUrl() {
@@ -108,7 +108,7 @@ String LCBUrl::getFragment() {
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
 
-void LCBUrl::parseUrl(String newUrl) {
+bool LCBUrl::parseUrl(String newUrl) {
     // http://lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80/status
     url = "http://b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io/status"; // Normalize according to RFC3986
     scheme = "http"; // Normalize to http or https, lowercase
@@ -119,4 +119,5 @@ void LCBUrl::parseUrl(String newUrl) {
     path = "status";
     query="";
     fragment = "";
+    return true; // Validate URL was able to be parsed
 }
