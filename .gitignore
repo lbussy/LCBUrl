@@ -1,3 +1,10 @@
+# PlatformIO
+.pio
+.pioenvs
+.piolibdeps
+.vscode
+*.code-workspace
+
 # Prerequisites
 *.d
 
