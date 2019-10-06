@@ -32,6 +32,8 @@
 class LCBUrl {
     // User-accessible "public" interface
     public:
+        LCBUrl();
+        ~LCBUrl();
         void setUrl(String);
         String getUrl();
         String getScheme();
