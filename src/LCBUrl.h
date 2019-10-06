@@ -1,5 +1,5 @@
 /*
-    LCBU.h -    Library for handling URLs - This library will allow
+    LCBUrl.h -    Library for handling URLs - This library will allow
                 handling and manipulation of URLs according to RFC3986.
             
     Copyright (C) 2019 Lee C. Bussy (@LBussy)

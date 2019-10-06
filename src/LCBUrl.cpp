@@ -111,10 +111,10 @@ String LCBUrl::getFragment() {
 void LCBUrl::parseUrl(String newUrl) {
     // http://lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80/status
     url = "http://b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io/status";
-    scheme = "http";
+    scheme = "http"; // Normalize to http or https, lowercase
     authority = "lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80";
-    userinfo = "lbussy";
-    host = "b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io";
+    userinfo = "lbussy"; // Do not normalize, may include :password
+    host = "b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io"; // Normalize to lowercase
     port = 80;
     path = "status";
     query="";
