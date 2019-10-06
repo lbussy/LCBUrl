@@ -3,7 +3,7 @@
 #######################################
 
 #######################################
-# Datatypes (KEYWORD1)
+# Datatypes and Classes (KEYWORD1)
 #######################################
 
 LCBUrl	KEYWORD1
@@ -12,7 +12,16 @@ LCBUrl	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-doSomething	KEYWORD2
+setUrl	KEYWORD2
+getUrl	KEYWORD2
+getScheme	KEYWORD2
+getAuthority	KEYWORD2
+getUserInfo	KEYWORD2
+getHost	KEYWORD2
+getPort	KEYWORD2
+getPath	KEYWORD2
+getQuery	KEYWORD2
+getFragment	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

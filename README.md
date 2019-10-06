@@ -10,13 +10,13 @@ Arduino/lib/targets/libraries folder.
 
 When installed, this library should look like:
 
-Arduino/lib/targets/libraries/LCBUrl                (this library's folder)
-Arduino/lib/targets/libraries/LCBUrl/LCBUrl.cpp     (the library implementation file)
-Arduino/lib/targets/libraries/LCBUrl/LCBUrl.h       (the library description file)
-Arduino/lib/targets/libraries/LCBUrl/keywords.txt   (the syntax coloring file)
-Arduino/lib/targets/libraries/LCBUrl/examples       (the examples in the "open" menu)
-Arduino/lib/targets/libraries/LCBUrl/LICENSE        (the license for this library)
-Arduino/lib/targets/libraries/LCBUrl/README.md      (this file)
+Arduino/lib/targets/libraries/LCBUrl                    (this library's folder)
+Arduino/lib/targets/libraries/LCBUrl/src/LCBUrl.cpp     (the library implementation file)
+Arduino/lib/targets/libraries/LCBUrl/src/LCBUrl.h       (the library description file)
+Arduino/lib/targets/libraries/LCBUrl/keywords.txt       (the syntax coloring file)
+Arduino/lib/targets/libraries/LCBUrl/examples           (the examples in the "open" menu)
+Arduino/lib/targets/libraries/LCBUrl/LICENSE            (the license for this library)
+Arduino/lib/targets/libraries/LCBUrl/README.md          (this file)
 
 Building
 --------------------------------------------------------------------------------
