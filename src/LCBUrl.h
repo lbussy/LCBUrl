@@ -1,7 +1,9 @@
 /*
-    LCBUrl.h -    Library for handling URLs - This library will allow
+    LCBUrl.h -  Library for handling URLs - This library will allow
                 handling and manipulation of URLs according to RFC3986.
-            
+*/
+
+/*
     Copyright (C) 2019 Lee C. Bussy (@LBussy)
 
     This file is part of Lee Bussy's LCBUrl (LCB URL).
@@ -26,35 +28,52 @@
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
+#include <stdlib.h>
 #include <Arduino.h>
 
 // Library interface description
 class LCBUrl {
     // User-accessible "public" interface
     public:
-        LCBUrl();
-        ~LCBUrl();
+        LCBUrl() {};
+        ~LCBUrl() {};
         bool setUrl(String);
         String getUrl();
         String getScheme();
-        String getAuthority();
         String getUserInfo();
+        String getUserName();
+        String getPassword();
         String getHost();
         word getPort();
+        String getAuthority();
         String getPath();
+        String getAfterPath();
         String getQuery();
         String getFragment();
 
     // Library-accessible "private" interface
     private:
         bool parseUrl(String);
+        String getCleanTriplets();
+        String getStripScheme();
+        String getRawAuthority();
+        String getAfterAuth();
+        String getRemoveDotSegments();
         String url;
+        String cleantriplets;
         String scheme;
-        String authority;
+        String stripscheme;
+        String rawauthority;
+        String afterauth;
         String userinfo;
+        String username;
+        String password;
         String host;
         word port;
+        String authority;
         String path;
+        String removedotsegments;
+        String afterpath;
         String query;
         String fragment;
 };

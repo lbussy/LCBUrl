@@ -1,7 +1,9 @@
 /*
     LCBUrl.cpp -  Library for handling URLs - This library will allow
-                handling and manipulation of URLs according to RFC3986.
-            
+                  handling and manipulation of URLs according to RFC3986.
+*/
+
+/*
     Copyright (C) 2019 Lee C. Bussy (@LBussy)
 
     This file is part of Lee Bussy's LCBUrl (LCB URL).
@@ -20,47 +22,12 @@
     with LCBUrl. If not, see <https://www.gnu.org/licenses/>.
 */
 
-// include this library's description file
-#include "LCBUrl.h"
+// Include this library's description file
 
-// Going to be receiving a URL that looks like this:
-// http://b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io/status
-//
-// TODO:
-//  [ ] Normalize URL: https://tools.ietf.org/html/rfc3986
-//      [ ] Convert percent-encoded triplets to uppercase: https://tools.ietf.org/html/rfc3986#section-6.2.2.1
-//      [ ] Convert the scheme and host to lowercase (not User@) : https://tools.ietf.org/html/rfc3986#section-6.2.2.1
-//      [ ] Decode percent-encoded triplets of unreserved characters: https://tools.ietf.org/html/rfc3986#section-6.2.2.2
-//          Percent-encoded triplets of the URI in the ranges of ALPHA
-//          (%41–%5A and %61–%7A), DIGIT (%30–%39), hyphen (%2D), period
-//          (%2E), underscore (%5F), or tilde (%7E) do not require 
-//          percent-encoding and should be decoded to their corresponding
-//          unreserved characters.
-//      [ ] Remove dot-segments: https://tools.ietf.org/html/rfc3986#section-6.2.2.3
-//      [ ] Convert an empty path to a "/" path: : https://tools.ietf.org/html/rfc3986#section-6.2.3
-//      [ ] Remove the default port : https://tools.ietf.org/html/rfc3986#section-6.2.3
-//  [ ] Get scheme
-//  [ ] Get host (up to first : or /)
-//  [ ] Get port if it exists
-//  [ ] Get path if it exists
-//  [ ] Get user if it exists
+#include "LCBUrl.h"
 
 // Constructor/Destructor ////////////////////////////////////////////////
 // Handle the creation, setup, and destruction of instances
-
-LCBUrl::LCBUrl() {
-    // Initialize this instance's variables
-    url = "";
-    host = "";
-    port = 80;
-    path = "";
-    userinfo = "";
-
-    // Initialize the library
-
-}
-
-LCBUrl::~LCBUrl() { }
 
 // Public Methods //////////////////////////////////////////////////////////////
 // Functions available in sketches, this library, and other libraries
@@ -70,38 +37,200 @@ bool LCBUrl::setUrl(String newUrl) {
 }
 
 String LCBUrl::getUrl() {
+    //  [ ] Normalize URL: https://tools.ietf.org/html/rfc3986
+    //      [X] Convert percent-encoded triplets to uppercase: https://tools.ietf.org/html/rfc3986#section-6.2.2.1
+    //      [X] Convert the scheme and host to lowercase (not User@) : https://tools.ietf.org/html/rfc3986#section-6.2.2.1
+    //      [X] Decode percent-encoded triplets of unreserved characters: https://tools.ietf.org/html/rfc3986#section-6.2.2.2
+    //          Percent-encoded triplets of the URI in the ranges of ALPHA
+    //          (%41–%5A and %61–%7A), DIGIT (%30–%39), hyphen (%2D), period
+    //          (%2E), underscore (%5F), or tilde (%7E) do not require 
+    //          percent-encoding and should be decoded to their corresponding
+    //          unreserved characters.
+    //      [ ] Remove dot-segments: https://tools.ietf.org/html/rfc3986#section-6.2.2.3
+    //      [X] Convert an empty path to a "/" path: : https://tools.ietf.org/html/rfc3986#section-6.2.3
+    //      [X] Remove the default port : https://tools.ietf.org/html/rfc3986#section-6.2.3
     return url;
 }
 
-String LCBUrl::getScheme() {
+String LCBUrl::getScheme() { // Only finds http and https as scheme
+    if (!scheme) {
+        scheme = "";
+        int loc = getCleanTriplets().indexOf(F(":"), 0);
+        if (loc) {
+            String s = getCleanTriplets().substring(0, loc - 1);
+            s.toLowerCase();
+            if ((s == F("http")) || (s == F("https"))) {
+                scheme = s;
+            }
+        }
+    }
     return scheme;
 }
 
-String LCBUrl::getAuthority() {
-    return authority;
+String LCBUrl::getRawAuthority() {
+    // Authority is similar to "lbussy@raspberrypi.local:80"
+    if (!rawauthority) {
+        rawauthority = "";
+        String tempUrl = getStripScheme();
+        if ((tempUrl) && (tempUrl.length() > 0)) {
+            int loc = tempUrl.indexOf(F("/"), 0);
+            if (loc) {
+                rawauthority = tempUrl.substring(0, loc - 1);
+            }
+        }
+    }
+    return rawauthority;
 }
 
 String LCBUrl::getUserInfo() {
-    return userinfo;
+    // UserInfo will be anything to the left of @ in authority
+    if (!userinfo) {
+        String tempUrl = getRawAuthority();
+        if (tempUrl) {
+            int loc = tempUrl.indexOf(F("@"), 0);
+            if (loc) {
+                return tempUrl.substring(0, loc - 1);
+            }
+        } else {
+            return {};
+        }
+    }
+}
+
+String LCBUrl::getUserName() {
+    // User Name will be anything to the left of : in userinfo
+    if (!username) {
+        String tempUrl = getUserInfo();
+        if (tempUrl) {
+            int loc = tempUrl.indexOf(F(":"), 0);
+            if (loc) {
+                return tempUrl.substring(0, loc - 1);
+            }
+        } else {
+            return tempUrl;
+        }
+    }
+}
+
+String LCBUrl::getPassword() {
+    // Password will be anything to the right of : in userinfo
+    if (!password) {
+        String tempUrl = getUserInfo();
+        if (tempUrl) {
+            int loc = tempUrl.indexOf(F(":"), 0);
+            if (loc) {
+                return tempUrl.substring(loc + 1);
+            }
+        } else {
+            return {};
+        }
+    }
 }
 
 String LCBUrl::getHost() {
+    // Host will be anything between @ and : or / in authority
+    if (!host) {
+        host = "";
+        String tempUrl = getRawAuthority();
+        if (tempUrl) {
+            int startloc = tempUrl.indexOf(F("@"), 0);
+            if (startloc) {
+                tempUrl.substring(startloc + 1);
+            }
+            int endloc = tempUrl.indexOf(F(":"), 0);
+            if (endloc) {
+                tempUrl.substring(0, endloc - 1);
+            }
+        }
+    }
+    host.toLowerCase();
     return host;
 }
 
 word LCBUrl::getPort() {
+    // Port will be any integer between : and / in authority
+    if (!port) {
+        port = 0;
+        String tempUrl = getRawAuthority();
+        if (tempUrl) {
+            int startloc = tempUrl.lastIndexOf(F(":"));
+            if (startloc) {
+                tempUrl.substring(startloc + 1);
+            }
+            int endloc = tempUrl.lastIndexOf(F("/"));
+            if (endloc) {
+                tempUrl.substring(0, endloc - 1);
+            }
+            port = tempUrl.toDouble();
+        }
+    }
+    if ((getScheme() == F("http")) && (port == 80)) port = 0;
+    if ((getScheme() == F("https")) && (port == 443)) port = 0;
     return port;
 }
 
+String LCBUrl::getAuthority() {
+    // Authority is similar to "lbussy:password@raspberrypi.local:80"
+    if (!authority) {
+        authority = "";
+        if (getUserName().length() > 0) {
+            authority = getUserName();
+        }
+        if (getPassword().length() > 0) {
+            authority.concat(F(":"));
+            authority.concat(getPassword());
+        }
+        authority.concat(getHost());
+        if (getPort() > 0) {
+            authority.concat(F(":"));
+            authority.concat(String(getHost()));
+        }
+    }
+    return authority;
+}
+
 String LCBUrl::getPath() {
+    // Path will be between the / after host and ?
+    // Add a trailing slash if no filename given
+    if (!path) {
+        String tempUrl = getStripScheme();
+        int startloc = tempUrl.indexOf(F("/"));
+        if (startloc) {
+            tempUrl.substring(startloc + 1);
+        }
+        int endloc = tempUrl.lastIndexOf(F("?"));
+        if (endloc) {
+            tempUrl.substring(0, endloc - 1);
+        }
+        int lastpath = tempUrl.lastIndexOf(F("/"));
+        if ((lastpath) && (lastpath < tempUrl.length())) { // Filename exists
+            int dotloc = tempUrl.lastIndexOf(F("."));
+            if (!dotloc) {
+                tempUrl.concat(F("/"));
+            }
+        }
+        path = tempUrl;
+    }
     return path;
 }
 
 String LCBUrl::getQuery() {
+    if (!query) {
+        query="";
+        String tempUrl = getAfterPath();
+        int fraglog = tempUrl.lastIndexOf(F("#"));
+        query = tempUrl.substring(0, fraglog - 1);
+    }
     return query;
 }
 
 String LCBUrl::getFragment() {
+    if (!fragment) {
+        fragment = "";
+        String tempUrl = getAfterPath();
+        int fraglog = tempUrl.lastIndexOf(F("#"));
+        fragment = tempUrl.substring(fraglog + 1);
+    }
     return fragment;
 }
 
@@ -110,14 +239,98 @@ String LCBUrl::getFragment() {
 
 bool LCBUrl::parseUrl(String newUrl) {
     // http://lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80/status
-    url = "http://b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io/status"; // Normalize according to RFC3986
-    scheme = "http"; // Normalize to http or https, lowercase
-    authority = "lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80";
-    userinfo = "lbussy"; // Do not normalize, may include :password
-    host = "b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io"; // Normalize to lowercase
-    port = 80;
-    path = "/status"; // Make sure this has a leading slash
-    query="";
-    fragment = "";
+    url = newUrl; // DEBUG:  Normalize according to RFC3986
+    scheme = getScheme();
     return true; // Validate URL was able to be parsed
+}
+
+String LCBUrl::getStripScheme() { // Remove scheme and "://" discriminately
+    if (!stripscheme) {
+        stripscheme = "";
+        String tempUrl = getCleanTriplets();
+        int length = getCleanTriplets().length();
+        int slength = getScheme().length();
+        
+        // Remove scheme and ://
+        if ((slength > 0) && (length > slength + 3)) {
+            tempUrl.remove(0, slength); // Remove scheme
+            for (int i; i <=3; i++) { // Remove "://" discriminately
+                if (isAlphaNumeric(tempUrl.charAt(i))) {
+                    tempUrl.remove(i, tempUrl.length());
+                    stripscheme = tempUrl;
+                }
+            }
+        }
+    }
+    return stripscheme;
+}
+
+String LCBUrl::getAfterAuth() { // Get anything after the authority
+    if (!afterauth) {
+        afterauth = "";
+        String tempUrl = getStripScheme();
+        int length = getRawAuthority().length();
+      
+        if (tempUrl.length() > length + 1) {
+            tempUrl.remove(length + 1); // Remove authority
+            afterauth = tempUrl;
+        }
+    }
+    return afterauth;
+}
+
+String LCBUrl::getAfterPath() { // Get anything after the path
+    if (!afterpath) {
+        afterpath = "";
+        String tempUrl = getCleanTriplets();
+        int queryloc = tempUrl.lastIndexOf(F("?"));
+        if (queryloc) {
+            afterpath = tempUrl.substring(queryloc + 1);
+        }
+    }
+    return afterpath;
+}
+
+String LCBUrl::getCleanTriplets() {
+    if (!cleantriplets) {
+        cleantriplets = url;
+        int i = 0;
+        while (i < url.length()) {
+            int loc = url.indexOf(F("%"), i);
+            if (loc) {
+                String triplet = url.substring(loc + 1, loc + 3);
+                triplet.toUpperCase();
+                const char* hex = triplet.c_str();
+
+                // Convert hex string to a character
+                int x;
+                char *endptr;
+                x = strtol(hex, &endptr, 16);
+                char character = char(x);
+
+                // Check for characters which should be decoded
+                if (
+                    (isAlphaNumeric(character)) ||
+                    (character == '-') ||
+                    (character == '.') ||
+                    (character == '_') ||
+                    (character == '~')){
+                        String before = cleantriplets.substring(0, loc-1);
+                        String after = cleantriplets.substring(loc + 3);
+                        cleantriplets = before + character + after;
+                }
+            } else {
+                i = url.length();
+            }
+        }
+    }
+    return cleantriplets;
+}
+
+String LCBUrl::getRemoveDotSegments() {
+    if (!removedotsegments) {
+        removedotsegments = getPath();
+        // TODO:  Figure this shit out
+    }
+    return removedotsegments;
 }
