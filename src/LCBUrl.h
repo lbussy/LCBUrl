@@ -58,7 +58,7 @@ class LCBUrl {
         String getStripScheme();
         String getRawAuthority();
         String getAfterAuth();
-        String getRemoveDotSegments();
+        String getPathSegment();
         String url;
         String cleantriplets;
         String scheme;
@@ -71,6 +71,7 @@ class LCBUrl {
         String host;
         word port;
         String authority;
+        String pathsegment;
         String path;
         String removedotsegments;
         String afterpath;

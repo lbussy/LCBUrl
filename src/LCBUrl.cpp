@@ -33,22 +33,30 @@
 // Functions available in sketches, this library, and other libraries
 
 bool LCBUrl::setUrl(String newUrl) {
-    return parseUrl(newUrl);
+    if (getUrl() == "") {return false;} else {return true;}
 }
 
 String LCBUrl::getUrl() {
-    //  [ ] Normalize URL: https://tools.ietf.org/html/rfc3986
-    //      [X] Convert percent-encoded triplets to uppercase: https://tools.ietf.org/html/rfc3986#section-6.2.2.1
-    //      [X] Convert the scheme and host to lowercase (not User@) : https://tools.ietf.org/html/rfc3986#section-6.2.2.1
-    //      [X] Decode percent-encoded triplets of unreserved characters: https://tools.ietf.org/html/rfc3986#section-6.2.2.2
-    //          Percent-encoded triplets of the URI in the ranges of ALPHA
-    //          (%41–%5A and %61–%7A), DIGIT (%30–%39), hyphen (%2D), period
-    //          (%2E), underscore (%5F), or tilde (%7E) do not require 
-    //          percent-encoding and should be decoded to their corresponding
-    //          unreserved characters.
-    //      [ ] Remove dot-segments: https://tools.ietf.org/html/rfc3986#section-6.2.2.3
-    //      [X] Convert an empty path to a "/" path: : https://tools.ietf.org/html/rfc3986#section-6.2.3
-    //      [X] Remove the default port : https://tools.ietf.org/html/rfc3986#section-6.2.3
+    if (!url) {
+        url = "";
+        if ((getScheme() == "") || (getHost() == "")) {
+            return url;
+        } else {
+            url.concat(getScheme());
+            url.concat(F("://"));
+            url.concat(getAuthority());
+            url.concat(F("/"));
+            url.concat(getPath());
+            if (getQuery() != "") {
+                url.concat(F("?"));
+                url.concat(getPath());
+            }
+            if (getFragment() != "") {
+                url.concat(F("#"));
+                url.concat(getFragment());
+            }
+        }
+    }
     return url;
 }
 
@@ -190,26 +198,9 @@ String LCBUrl::getAuthority() {
 }
 
 String LCBUrl::getPath() {
-    // Path will be between the / after host and ?
-    // Add a trailing slash if no filename given
     if (!path) {
-        String tempUrl = getStripScheme();
-        int startloc = tempUrl.indexOf(F("/"));
-        if (startloc) {
-            tempUrl.substring(startloc + 1);
-        }
-        int endloc = tempUrl.lastIndexOf(F("?"));
-        if (endloc) {
-            tempUrl.substring(0, endloc - 1);
-        }
-        int lastpath = tempUrl.lastIndexOf(F("/"));
-        if ((lastpath) && (lastpath < tempUrl.length())) { // Filename exists
-            int dotloc = tempUrl.lastIndexOf(F("."));
-            if (!dotloc) {
-                tempUrl.concat(F("/"));
-            }
-        }
-        path = tempUrl;
+        path = getPathSegment();
+        // TODO:  Figure this shit out - remove dot segments
     }
     return path;
 }
@@ -238,10 +229,7 @@ String LCBUrl::getFragment() {
 // Functions only available to other functions in this library
 
 bool LCBUrl::parseUrl(String newUrl) {
-    // http://lbussy@b97945a0-dffc-427f-b81c-cf811e96faf1.mock.pstmn.io:80/status
-    url = newUrl; // DEBUG:  Normalize according to RFC3986
-    scheme = getScheme();
-    return true; // Validate URL was able to be parsed
+    getUrl();
 }
 
 String LCBUrl::getStripScheme() { // Remove scheme and "://" discriminately
@@ -293,12 +281,12 @@ String LCBUrl::getAfterPath() { // Get anything after the path
 
 String LCBUrl::getCleanTriplets() {
     if (!cleantriplets) {
-        cleantriplets = url;
+        cleantriplets = getUrl();
         int i = 0;
-        while (i < url.length()) {
-            int loc = url.indexOf(F("%"), i);
+        while (i < getUrl().length()) {
+            int loc = getUrl().indexOf(F("%"), i);
             if (loc) {
-                String triplet = url.substring(loc + 1, loc + 3);
+                String triplet = getUrl().substring(loc + 1, loc + 3);
                 triplet.toUpperCase();
                 const char* hex = triplet.c_str();
 
@@ -320,17 +308,34 @@ String LCBUrl::getCleanTriplets() {
                         cleantriplets = before + character + after;
                 }
             } else {
-                i = url.length();
+                i = getUrl().length();
             }
         }
     }
     return cleantriplets;
 }
 
-String LCBUrl::getRemoveDotSegments() {
-    if (!removedotsegments) {
-        removedotsegments = getPath();
-        // TODO:  Figure this shit out
+String LCBUrl::getPathSegment() {
+    // Path will be between the / after host and ?
+    // Add a trailing slash if no filename given
+    if (!pathsegment) {
+        String tempUrl = getStripScheme();
+        int startloc = tempUrl.indexOf(F("/"));
+        if (startloc) {
+            tempUrl.substring(startloc + 1);
+        }
+        int endloc = tempUrl.lastIndexOf(F("?"));
+        if (endloc) {
+            tempUrl.substring(0, endloc - 1);
+        }
+        int lastpath = tempUrl.lastIndexOf(F("/"));
+        if ((lastpath) && (lastpath < tempUrl.length())) { // Filename exists
+            int dotloc = tempUrl.lastIndexOf(F("."));
+            if (!dotloc) {
+                tempUrl.concat(F("/"));
+            }
+        }
+        pathsegment = tempUrl;
     }
-    return removedotsegments;
+    return pathsegment;
 }
