@@ -22,20 +22,19 @@
     with LCBUrl. If not, see <https://www.gnu.org/licenses/>.
 */
 
-// Pattern:  https://www.arduino.cc/en/uploads/Hacking/Test.zip  (DEBUG: TODO:)
-
 // Ensure this library description is only included once
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
-#include <stdlib.h>
+#include <string>
+#include <ArduinoLog.h> // DEBUG
 #include <Arduino.h>
 
 // Library interface description
 class LCBUrl {
     // User-accessible "public" interface
     public:
-        LCBUrl() {};
+        LCBUrl();
         ~LCBUrl() {};
         bool setUrl(String);
         String getUrl();
@@ -53,14 +52,15 @@ class LCBUrl {
 
     // Library-accessible "private" interface
     private:
-        bool parseUrl(String);
+        String getRawUrl();
         String getCleanTriplets();
         String getStripScheme();
         String getRawAuthority();
         String getAfterAuth();
         String getPathSegment();
+        String rawurl;
         String url;
-        String cleantriplets;
+        String workingurl;
         String scheme;
         String stripscheme;
         String rawauthority;

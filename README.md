@@ -1,8 +1,36 @@
 # LCBUrl - An Arduino library for handling URLs
 
-This library is absolutely not ready for anyone to even look at it let alone try to do something with it.
+This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy but if not I'm still using it in my own works.
 
-Installation
+This library will parse a url, normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).
+
+## Public Methods
+
+- `bool setUrl(String)` - Pass the URL to be handled to the class
+- `String getUrl()` - Return a processed URI in the following format: `scheme:[//authority]path[?query][#fragment]`
+- `String getScheme()` - Get the scheme (currently only handles http and https)
+- `String getUserInfo()` - Return username and password (if present)
+- `String getUserName()` - Returns username (if present)
+- `String getPassword()` - Returns password (if present)
+- `String getHost()` - Return host name
+- `word getPort()` - Return port (if present) if non-standard
+- `String getAuthority()` - Return the authority (if present) in the following format: `[userinfo@]host[:port]`
+- `String getPath()` - Returns the path segment (if present) with any query or fragment removed
+- `String getAfterPath()` - Returns query and fragment segments (if present)
+- `String getQuery()` - Returns query (if present)
+- `String getFragment()` - Returns fragment (if present)
+
+## Progress:
+
+[X] Convert percent-encoded triplets to uppercase
+[X] Convert the scheme and host to lowercase
+[X] Decode percent-encoded triplets of unreserved characters
+[ ] Remove dot-segments
+[X] Convert an empty path to a "/" path
+[X] Remove the default port
+[X] Add a trailing "/" to a non-empty path (may remove this)
+
+## Installation
 --------------------------------------------------------------------------------
 
 To install this library, just place this entire folder as a subfolder in your
@@ -19,7 +47,7 @@ Arduino/lib/targets/libraries/LCBUrl/LICENSE            (the license for this li
 Arduino/lib/targets/libraries/LCBUrl/README.md          (this file)
 ```
 
-Building
+## Building
 --------------------------------------------------------------------------------
 
 After this library is installed, you just have to start the Arduino application.
@@ -30,12 +58,3 @@ select LCBUrl.  This will add a corresponding line to the top of your sketch:
 #include <LCBUrl.h>
 
 To stop using this library, delete that line from your sketch.
-
-Geeky information:
-After a successful build of this library, a new file named "LCBUrl.o" will appear
-in "Arduino/lib/targets/libraries/LCBUrl". This file is the built/compiled library
-code.
-
-If you choose to modify the code for this library (i.e. "LCBUrl.cpp" or "LCBUrl.h"),
-then you must first 'unbuild' this library by deleting the "LCBUrl.o" file. The
-new "LCBUrl.o" with your code will appear after the next press of "verify"

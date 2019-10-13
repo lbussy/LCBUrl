@@ -29,43 +29,52 @@
 // Constructor/Destructor ////////////////////////////////////////////////
 // Handle the creation, setup, and destruction of instances
 
+LCBUrl::LCBUrl() {
+    port = -1;
+}
+
 // Public Methods //////////////////////////////////////////////////////////////
 // Functions available in sketches, this library, and other libraries
 
 bool LCBUrl::setUrl(String newUrl) {
-    if (getUrl() == "") {return false;} else {return true;}
+    rawurl = newUrl;
+    if (getUrl().length() == 0) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 String LCBUrl::getUrl() {
-    if (!url) {
+
+    if (url.length() == 0) {
         url = "";
+        url.concat(getScheme());
+        url.concat(F("://"));
+        url.concat(getAuthority());
+        url.concat(F("/"));
+        url.concat(getPath());
+        if (getQuery() != "") {
+            url.concat(F("?"));
+            url.concat(getQuery());
+        }
+        if (getFragment() != "") {
+            url.concat(F("#"));
+            url.concat(getFragment());
+        }
         if ((getScheme() == "") || (getHost() == "")) {
             return url;
-        } else {
-            url.concat(getScheme());
-            url.concat(F("://"));
-            url.concat(getAuthority());
-            url.concat(F("/"));
-            url.concat(getPath());
-            if (getQuery() != "") {
-                url.concat(F("?"));
-                url.concat(getPath());
-            }
-            if (getFragment() != "") {
-                url.concat(F("#"));
-                url.concat(getFragment());
-            }
         }
     }
     return url;
 }
 
-String LCBUrl::getScheme() { // Only finds http and https as scheme
-    if (!scheme) {
+String LCBUrl::getScheme() { // Currrently only finds http and https as scheme
+    if (scheme.length() == 0) {
         scheme = "";
-        int loc = getCleanTriplets().indexOf(F(":"), 0);
-        if (loc) {
-            String s = getCleanTriplets().substring(0, loc - 1);
+        int loc = getCleanTriplets().indexOf(F(":"));
+        if (loc > 0) {
+            String s = getCleanTriplets().substring(0, loc);
             s.toLowerCase();
             if ((s == F("http")) || (s == F("https"))) {
                 scheme = s;
@@ -76,14 +85,14 @@ String LCBUrl::getScheme() { // Only finds http and https as scheme
 }
 
 String LCBUrl::getUserInfo() {
-    // UserInfo will be anything to the left of @ in authority
-    if (!userinfo) {
+    // UserInfo will be anything to the left of the last @ in authority
+    if (userinfo.length() == 0) {
         userinfo = "";
         String tempUrl = getRawAuthority();
         if (tempUrl) {
-            int loc = tempUrl.indexOf(F("@"), 0);
-            if (loc) {
-                userinfo = tempUrl.substring(0, loc - 1);
+            int loc = tempUrl.lastIndexOf(F("@"));
+            if (loc > 0) {
+                userinfo = tempUrl.substring(0, loc);
             }
         }
     }
@@ -92,13 +101,13 @@ String LCBUrl::getUserInfo() {
 
 String LCBUrl::getUserName() {
     // User Name will be anything to the left of : in userinfo
-    if (!username) {
+    if (username.length() == 0) {
         username = "";
         String tempUrl = getUserInfo();
         if (tempUrl) {
-            int loc = tempUrl.indexOf(F(":"), 0);
-            if (loc) {
-                username = tempUrl.substring(0, loc - 1);
+            int loc = tempUrl.lastIndexOf(F(":"));
+            if (loc > 0) {
+                username = tempUrl.substring(0, loc);
             }
         }
     }
@@ -107,12 +116,12 @@ String LCBUrl::getUserName() {
 
 String LCBUrl::getPassword() {
     // Password will be anything to the right of : in userinfo
-    if (!password) {
+    if (password.length() == 0) {
         password = "";
         String tempUrl = getUserInfo();
         if (tempUrl) {
-            int loc = tempUrl.indexOf(F(":"), 0);
-            if (loc) {
+            int loc = tempUrl.lastIndexOf(F(":"));
+            if (loc > 0) {
                 password = tempUrl.substring(loc + 1);
             }
         }
@@ -122,18 +131,19 @@ String LCBUrl::getPassword() {
 
 String LCBUrl::getHost() {
     // Host will be anything between @ and : or / in authority
-    if (!host) {
+    if (host.length() == 0) {
         host = "";
         String tempUrl = getRawAuthority();
         if (tempUrl) {
-            int startloc = tempUrl.indexOf(F("@"), 0);
+            int startloc = tempUrl.lastIndexOf(F("@"));
             if (startloc) {
-                tempUrl.substring(startloc + 1);
+                tempUrl = tempUrl.substring(startloc + 1, tempUrl.length());
             }
             int endloc = tempUrl.indexOf(F(":"), 0);
             if (endloc) {
-                tempUrl.substring(0, endloc - 1);
+                tempUrl = tempUrl.substring(0, endloc);
             }
+            host = tempUrl;
         }
     }
     host.toLowerCase();
@@ -142,17 +152,17 @@ String LCBUrl::getHost() {
 
 word LCBUrl::getPort() {
     // Port will be any integer between : and / in authority
-    if (!port) {
+    if (port == 65535) {
         port = 0;
         String tempUrl = getRawAuthority();
-        if (tempUrl) {
+        if (tempUrl.length() > 0) {
             int startloc = tempUrl.lastIndexOf(F(":"));
             if (startloc) {
-                tempUrl.substring(startloc + 1);
+                tempUrl = tempUrl.substring(startloc + 1);
             }
             int endloc = tempUrl.lastIndexOf(F("/"));
             if (endloc) {
-                tempUrl.substring(0, endloc - 1);
+                tempUrl = tempUrl.substring(0, endloc - 1);
             }
             port = tempUrl.toDouble();
         }
@@ -163,8 +173,7 @@ word LCBUrl::getPort() {
 }
 
 String LCBUrl::getAuthority() {
-    // Authority is similar to "lbussy:password@raspberrypi.local:80"
-    if (!authority) {
+    if (authority.length() == 0) {
         authority = "";
         if (getUserName().length() > 0) {
             authority = getUserName();
@@ -173,17 +182,20 @@ String LCBUrl::getAuthority() {
             authority.concat(F(":"));
             authority.concat(getPassword());
         }
+        if (authority.length() > 0) {
+            authority.concat(F("@"));
+        }
         authority.concat(getHost());
         if (getPort() > 0) {
             authority.concat(F(":"));
-            authority.concat(String(getHost()));
+            authority.concat(String(getPort()));
         }
     }
     return authority;
 }
 
 String LCBUrl::getPath() {
-    if (!path) {
+    if (path.length() == 0) {
         path = getPathSegment();
         // TODO:  Figure this shit out - remove dot segments
     }
@@ -192,21 +204,23 @@ String LCBUrl::getPath() {
 }
 
 String LCBUrl::getQuery() {
-    if (!query) {
+    if (query.length() == 0) {
         query="";
         String tempUrl = getAfterPath();
-        int fraglog = tempUrl.lastIndexOf(F("#"));
-        query = tempUrl.substring(0, fraglog - 1);
+        int queryloc = tempUrl.lastIndexOf(F("#"));
+        query = tempUrl.substring(0, queryloc);
     }
     return query;
 }
 
 String LCBUrl::getFragment() {
-    if (!fragment) {
+    if (fragment.length() == 0) {
         fragment = "";
         String tempUrl = getAfterPath();
-        int fraglog = tempUrl.lastIndexOf(F("#"));
-        fragment = tempUrl.substring(fraglog + 1);
+        int fragloc = tempUrl.lastIndexOf(F("#"));
+        if (fragloc != -1) {
+            fragment = tempUrl.substring(fragloc + 1);
+        }
     }
     return fragment;
 }
@@ -214,23 +228,24 @@ String LCBUrl::getFragment() {
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
 
-bool LCBUrl::parseUrl(String newUrl) {
-    if (getUrl() != "") {return true;} else {return false;}
-}
-
 String LCBUrl::getStripScheme() { // Remove scheme and "://" discriminately
-    if (!stripscheme) {
+    if (stripscheme.length() == 0) {
         stripscheme = "";
         String tempUrl = getCleanTriplets();
         int length = getCleanTriplets().length();
         int slength = getScheme().length();
-        
         // Remove scheme and ://
         if ((slength > 0) && (length > slength + 3)) {
-            tempUrl.remove(0, slength); // Remove scheme
+            tempUrl = tempUrl.substring(slength); // Remove scheme;
             for (int i = 0; i <=3; i++) { // Remove "://" discriminately
-                if (isAlphaNumeric(tempUrl.charAt(i))) {
-                    tempUrl.remove(i, tempUrl.length());
+                if (
+                    (isAlphaNumeric(tempUrl.charAt(i))) ||
+                    (tempUrl.charAt(i) == '-') ||
+                    (tempUrl.charAt(i) == '.') ||
+                    (tempUrl.charAt(i) == '_') ||
+                    (tempUrl.charAt(i) == '~'))
+                {
+                    tempUrl = tempUrl.substring(i);
                     stripscheme = tempUrl;
                 }
             }
@@ -241,13 +256,13 @@ String LCBUrl::getStripScheme() { // Remove scheme and "://" discriminately
 
 String LCBUrl::getRawAuthority() {
     // Authority is similar to "lbussy@raspberrypi.local:80"
-    if (!rawauthority) {
+    if (rawauthority.length() == 0) {
         rawauthority = "";
         String tempUrl = getStripScheme();
         if ((tempUrl) && (tempUrl.length() > 0)) {
             int loc = tempUrl.indexOf(F("/"), 0);
-            if (loc) {
-                rawauthority = tempUrl.substring(0, loc - 1);
+            if (loc > 0) {
+                rawauthority = tempUrl.substring(0, loc);
             }
         }
     }
@@ -255,7 +270,7 @@ String LCBUrl::getRawAuthority() {
 }
 
 String LCBUrl::getAfterAuth() { // Get anything after the authority
-    if (!afterauth) {
+    if (afterauth.length() == 0) {
         afterauth = "";
         String tempUrl = getStripScheme();
         unsigned int length = getRawAuthority().length();
@@ -269,25 +284,30 @@ String LCBUrl::getAfterAuth() { // Get anything after the authority
 }
 
 String LCBUrl::getAfterPath() { // Get anything after the path
-    if (!afterpath) {
+    if (afterpath.length() == 0) {
         afterpath = "";
         String tempUrl = getCleanTriplets();
         int queryloc = tempUrl.lastIndexOf(F("?"));
-        if (queryloc) {
-            afterpath = tempUrl.substring(queryloc + 1);
+        if (queryloc != -1) {
+            afterpath = tempUrl.substring(queryloc);
+        } else {
+            int queryloc = tempUrl.lastIndexOf(F("#"));
+            if (queryloc != -1) {
+                afterpath = tempUrl.substring(queryloc);    
+            }     
         }
     }
     return afterpath;
 }
 
 String LCBUrl::getCleanTriplets() {
-    if (!cleantriplets) {
-        cleantriplets = getUrl();
-        unsigned int i = 0;
-        while (i < getUrl().length()) {
-            int loc = getUrl().indexOf(F("%"), i);
-            if (loc) {
-                String triplet = getUrl().substring(loc + 1, loc + 3);
+    if (workingurl.length() == 0) {
+        workingurl = rawurl;
+        unsigned int i = workingurl.length();
+        while (i != 0) {
+            int loc = workingurl.lastIndexOf(F("%"), i);
+            if (loc != -1) {
+                String triplet = rawurl.substring(loc + 1, loc + 3);
                 triplet.toUpperCase();
                 const char* hex = triplet.c_str();
 
@@ -303,36 +323,43 @@ String LCBUrl::getCleanTriplets() {
                     (character == '-') ||
                     (character == '.') ||
                     (character == '_') ||
-                    (character == '~')){
-                        String before = cleantriplets.substring(0, loc-1);
-                        String after = cleantriplets.substring(loc + 3);
-                        cleantriplets = before + character + after;
+                    (character == '~'))
+                {
+                    String before = workingurl.substring(0, loc);
+                    String after = workingurl.substring(loc + 3);
+                    workingurl = before + character + after;
                 }
+                i--;
             } else {
-                i = getUrl().length();
+                i = 0;
             }
         }
     }
-    return cleantriplets;
+    return workingurl;
 }
 
 String LCBUrl::getPathSegment() {
     // Path will be between the / after host and ?
     // Add a trailing slash if no filename given
-    if (!pathsegment) {
+    if (pathsegment.length() == 0) {
         String tempUrl = getStripScheme();
         int startloc = tempUrl.indexOf(F("/"));
         if (startloc) {
-            tempUrl.substring(startloc + 1);
+            tempUrl = tempUrl.substring(startloc + 1);
         }
         int endloc = tempUrl.lastIndexOf(F("?"));
-        if (endloc) {
-            tempUrl.substring(0, endloc - 1);
+        if (endloc != -1) {
+            tempUrl = tempUrl.substring(0, endloc - 1);
+        } else {
+            int endloc = tempUrl.lastIndexOf(F("#"));
+            if (endloc != -1) {
+                tempUrl = tempUrl.substring(0, endloc - 1);
+            }
         }
         unsigned int lastpath = tempUrl.lastIndexOf(F("/"));
         if ((lastpath) && (lastpath < tempUrl.length())) { // Filename exists
             int dotloc = tempUrl.lastIndexOf(F("."));
-            if (!dotloc) {
+            if ((dotloc == -1) || ((dotloc < (int)lastpath) && (!tempUrl.endsWith(F("/"))))) {
                 tempUrl.concat(F("/"));
             }
         }
