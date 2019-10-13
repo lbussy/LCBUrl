@@ -168,8 +168,8 @@ word LCBUrl::getPort() {
         }
     }
     if (port == 0) {
-        if (getScheme() == F("http")) port = 0;
-        if (getScheme() == F("https")) port = 0;
+        if (getScheme() == F("http")) port = 80;
+        if (getScheme() == F("https")) port = 443;
     }
     return port;
 }
