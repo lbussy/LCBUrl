@@ -167,8 +167,10 @@ word LCBUrl::getPort() {
             port = tempUrl.toDouble();
         }
     }
-    if ((getScheme() == F("http")) && (port == 80)) port = 0;
-    if ((getScheme() == F("https")) && (port == 443)) port = 0;
+    if (port == 0) {
+        if (getScheme() == F("http")) port = 0;
+        if (getScheme() == F("https")) port = 0;
+    }
     return port;
 }
 
@@ -187,8 +189,13 @@ String LCBUrl::getAuthority() {
         }
         authority.concat(getHost());
         if (getPort() > 0) {
-            authority.concat(F(":"));
-            authority.concat(String(getPort()));
+            if (
+                ((getScheme() == F("http")) && (port != 80)) ||
+                ((getScheme() == F("https")) && (port != 443))
+            ) {
+                authority.concat(F(":"));
+                authority.concat(String(getPort()));
+            }
         }
     }
     return authority;
