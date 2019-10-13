@@ -22,13 +22,13 @@ This library will parse a url, normalize it according to the information provide
 
 ## Progress:
 
-[X] Convert percent-encoded triplets to uppercase
-[X] Convert the scheme and host to lowercase
-[X] Decode percent-encoded triplets of unreserved characters
-[ ] Remove dot-segments
-[X] Convert an empty path to a "/" path
-[X] Remove the default port
-[X] Add a trailing "/" to a non-empty path (may remove this)
+- [X] Convert percent-encoded triplets to uppercase
+- [X] Convert the scheme and host to lowercase
+- [X] Decode percent-encoded triplets of unreserved characters
+- [ ] Remove dot-segments
+- [X] Convert an empty path to a "/" path
+- [X] Remove the default port
+- [X] Add a trailing "/" to a non-empty path (may remove this)
 
 ## Installation
 --------------------------------------------------------------------------------
