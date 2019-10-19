@@ -157,14 +157,13 @@ word LCBUrl::getPort() {
         String tempUrl = getRawAuthority();
         if (tempUrl.length() > 0) {
             int startloc = tempUrl.lastIndexOf(F(":"));
-            if (startloc) {
-                tempUrl = tempUrl.substring(startloc + 1);
-            }
             int endloc = tempUrl.lastIndexOf(F("/"));
-            if (endloc) {
+            if (startloc != -1)
+                tempUrl = tempUrl.substring(startloc + 1);
+            if (endloc != -1)
                 tempUrl = tempUrl.substring(0, endloc - 1);
-            }
-            port = tempUrl.toDouble();
+            if ((startloc != -1) && (endloc != -1))
+                port = tempUrl.toDouble();
         }
     }
     if (port == 0) {
