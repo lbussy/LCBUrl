@@ -2,7 +2,7 @@
 
 This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy but if not I'm still using it in my own works.
 
-This library will parse a url, normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).
+This library will parse a url, and normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).  For instance, pass in `http://%7EFoo:%7Ep@$$word@servername.local/%7Ethis/is/a/./path/test.php#frag` and access the hostname, user name, password, path, query string, fragment, etc.
 
 ## Public Methods
 
