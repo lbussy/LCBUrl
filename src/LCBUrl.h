@@ -27,7 +27,6 @@
 #define _LCBURL_H
 
 #include <string>
-#include <ArduinoLog.h> // DEBUG
 #include <Arduino.h>
 
 // Library interface description
