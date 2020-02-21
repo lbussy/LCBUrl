@@ -26,7 +26,7 @@
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
-#include <string>
+#include <string.h>
 #include <Arduino.h>
 
 // Library interface description
