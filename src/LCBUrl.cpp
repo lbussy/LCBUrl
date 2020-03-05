@@ -30,7 +30,25 @@
 // Handle the creation, setup, and destruction of instances
 
 LCBUrl::LCBUrl() {
-    port = -1;
+    this.rawurl = "";
+    this.url = "";
+    this.workingurl = "";
+    this.scheme = "";
+    this.stripscheme = "";
+    this.rawauthority = "";
+    this.afterauth = "";
+    this.userinfo = "";
+    this.username = "";
+    this.password = "";
+    this.host = "";
+    this.port = -1;
+    this.authority = "";
+    this.pathsegment = "";
+    this.path = "";
+    this.removedotsegments = "";
+    this.afterpath = "";
+    this.query = "";
+    this.fragment = "";
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
