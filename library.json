@@ -2,23 +2,20 @@
     "name": "LCBUrl",
     "keywords": "LCB, url, split, access, manipulate, scheme, host, authority, port, path, query, fragment",
     "description": "A library to manipulate URL strings",
-    "repository":
-    {
-      "type": "git",
-      "url": "https://github.com/lbussy/LCBUrl"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lbussy/LCBUrl"
     },
-    "authors":
-    [
-      {
-        "name": "Lee Bussy",
-        "email": "lee@bussy.org",
-        "url": "https://github.com/lbussy/LCBUrl",
-        "maintainer": true
-      }
+    "authors": [
+        {
+            "name": "Lee Bussy",
+            "email": "lee@bussy.org",
+            "url": "https://github.com/lbussy/LCBUrl",
+            "maintainer": true
+        }
     ],
-    "dependencies":
-    {},
-    "version": "1.0.0",
+    "dependencies": {},
+    "version": "1.0.1",
     "frameworks": "arduino",
     "platforms": "*"
-  }
+}
