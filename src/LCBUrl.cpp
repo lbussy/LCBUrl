@@ -41,7 +41,7 @@ LCBUrl::LCBUrl() {
     username = "";
     password = "";
     host = "";
-    port = -1;
+    port = 65535;
     authority = "";
     pathsegment = "";
     path = "";
