@@ -4,6 +4,7 @@ This library was written by and for a non-programmer.  If you find some use out 
 
 This library will parse a url, and normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).  For instance; passing in `http://%7EFoo:%7Ep@$$word@servername.local:80/%7Ethis/is/a/./path/test.php?foo=bar#frag` will allow you to access the hostname, user name, password, path, query string, fragment, etc. as follows:
 
+- getUrl() = http://~Foo:~p@$$word@servername.local/~this/is/a/./path/test.php?foo=bar#frag
 - getScheme() = http
 - getUserInfo() = ~Foo:~p@$$word
 - getUserName() = ~Foo
@@ -11,9 +12,9 @@ This library will parse a url, and normalize it according to the information pro
 - getHost() = servername.local
 - getPort() = 80
 - getAuthority() = ~Foo:~p@$$word@servername.local
-- getPath() = ~this/is/a/./path/test.ph
+- getPath() = ~this/is/a/./path/test.php
 - getAfterPath() = ?foo=bar#frag
-- getQuery() = ?foo=bar
+- getQuery() = foo=bar
 - getFragment() = frag
 
 ## Public Methods
