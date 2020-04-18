@@ -1,7 +1,7 @@
 /*
-    Basic.ino -  Test sketch to demonstrate handling URLs via LCBUrl - This
-                  library will allow handling and manipulation of URLs
-                  according to RFC3986.
+    Basic.ino - Test sketch to demonstrate handling URLs via LCBUrl - This
+                library will allow handling and manipulation of URLs
+                according to RFC3986.
 */
 
 /*
@@ -42,7 +42,7 @@ void setup() {
     if (!url.setUrl(myUrl)) {
         Serial.println(F("Failure in setUrl();"));
     } else {
-        Serial.print(F("Return from setUrl()"));
+        Serial.println(F("Return from setUrl():"));
         Serial.print(F("\tgetUrl(); = "));
         Serial.println(url.getUrl().c_str());
         Serial.print(F("\tgetScheme(); = "));
