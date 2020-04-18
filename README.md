@@ -12,7 +12,7 @@ This library will parse a url, and normalize it according to the information pro
 - getHost() = servername.local
 - getPort() = 80
 - getAuthority() = ~Foo:~p@$$word@<span/>servername.local
-- getPath() = ~this/is/a/./path/test.ph
+- getPath() = ~this/is/a/./path/test.php
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = foo=bar
 - getFragment() = frag
