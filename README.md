@@ -10,7 +10,7 @@ This library will parse a url, and normalize it according to the information pro
 - getPassword() = ~p@$$word
 - getHost() = servername.local
 - getPort() = 80
-- getAuthority() = ~Foo:~p@$$word@servername.local
+- getAuthority() = ~Foo:~p@$$word@<span/>servername.local
 - getPath() = ~this/is/a/./path/test.ph
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = ?foo=bar
