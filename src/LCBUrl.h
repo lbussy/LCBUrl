@@ -35,52 +35,53 @@
 #include <Arduino.h>
 
 // Library interface description
-class LCBUrl {
+class LCBUrl
+{
     // User-accessible "public" interface
-    public:
-        LCBUrl();
-        ~LCBUrl() {};
-        bool setUrl(String);
-        String getUrl();
-        String getScheme();
-        String getUserInfo();
-        String getUserName();
-        String getPassword();
-        String getHost();
-        word getPort();
-        String getAuthority();
-        String getPath();
-        String getAfterPath();
-        String getQuery();
-        String getFragment();
+public:
+    LCBUrl();
+    ~LCBUrl(){};
+    bool setUrl(const String &);
+    String getUrl();
+    String getScheme();
+    String getUserInfo();
+    String getUserName();
+    String getPassword();
+    String getHost();
+    word getPort();
+    String getAuthority();
+    String getPath();
+    String getAfterPath();
+    String getQuery();
+    String getFragment();
 
     // Library-accessible "private" interface
-    private:
-        String getRawUrl();
-        String getCleanTriplets();
-        String getStripScheme();
-        String getRawAuthority();
-        String getAfterAuth();
-        String getPathSegment();
-        String rawurl;
-        String url;
-        String workingurl;
-        String scheme;
-        String stripscheme;
-        String rawauthority;
-        String afterauth;
-        String userinfo;
-        String username;
-        String password;
-        String host;
-        word port;
-        String authority;
-        String pathsegment;
-        String path;
-        String removedotsegments;
-        String afterpath;
-        String query;
-        String fragment;
+private:
+    String getRawUrl();
+    String getCleanTriplets();
+    String getStripScheme();
+    String getRawAuthority();
+    String getAfterAuth();
+    String getPathSegment();
+    String rawurl;
+    String url;
+    String workingurl;
+    String scheme;
+    String stripscheme;
+    String rawauthority;
+    String afterauth;
+    String userinfo;
+    String username;
+    String password;
+    String host;
+    word port;
+    String authority;
+    String pathsegment;
+    String path;
+    String removedotsegments;
+    String afterpath;
+    String query;
+    String fragment;
 };
 
 #endif // _LCBURL_H
