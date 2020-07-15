@@ -563,11 +563,17 @@ String LCBUrl::getPathSegment()
     if (pathsegment.length() == 0)
     {
         String tempUrl = getStripScheme();
+
         int startloc = tempUrl.indexOf(F("/"));
-        if (startloc)
+        if (startloc > 0)
         {
             tempUrl = tempUrl.substring(startloc + 1);
         }
+        else
+        {
+            tempUrl = "";
+        }
+
         int endloc = tempUrl.lastIndexOf(F("?"));
         if (endloc != -1)
         {
@@ -581,6 +587,7 @@ String LCBUrl::getPathSegment()
                 tempUrl = tempUrl.substring(0, endloc - 1);
             }
         }
+
         unsigned int lastpath = tempUrl.lastIndexOf(F("/"));
         if ((lastpath) && (lastpath < tempUrl.length()))
         { // Filename exists
