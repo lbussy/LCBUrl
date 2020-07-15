@@ -38,6 +38,7 @@ LCBUrl::LCBUrl()
 {
     rawurl = "";
     url = "";
+    ipurl = "";
     workingurl = "";
     scheme = "";
     stripscheme = "";
@@ -47,8 +48,10 @@ LCBUrl::LCBUrl()
     username = "";
     password = "";
     host = "";
+    ipaddress = INADDR_NONE;
     port = 65535;
     authority = "";
+    ipauthority = "";
     pathsegment = "";
     path = "";
     removedotsegments = "";
@@ -69,13 +72,13 @@ bool LCBUrl::setUrl(const String &newUrl)
     }
     else
     {
+        getIP(); // We neeed to try this up front and pre-cache
         return true;
     }
 }
 
 String LCBUrl::getUrl()
 {
-
     if (url.length() == 0)
     {
         url = "";
@@ -101,6 +104,42 @@ String LCBUrl::getUrl()
     }
     return url;
 }
+
+String LCBUrl::getIPUrl()
+{
+    if (url.length() == 0)
+    {
+        url = "";
+        url.concat(getScheme()); // http or https
+        url.concat(F("://"));
+        url.concat(getIPAuthority()); // Username, password, host and port
+        url.concat(F("/"));
+        url.concat(getPath()); // Path
+        if (getQuery() != "") // Add a query string
+        {
+            url.concat(F("?"));
+            url.concat(getQuery());
+        }
+        if (getFragment() != "") // Add a fragment
+        {
+            url.concat(F("#"));
+            url.concat(getFragment());
+        }
+        if ((getScheme() == "") || (getHost() == "")) // No idea what I was thinking here
+        {
+            return url;
+        }
+    }
+    return url;
+}
+
+bool LCBUrl::isMDNS()
+{
+    return getHost().endsWith(".local");
+    // Can use following for C++
+    // return host.size() >= suffix.size() && 0 == host.compare(host.size()-suffix.size(), suffix.size(), suffix);
+}
+
 
 String LCBUrl::getScheme()
 { // Currrently only finds http and https as scheme
@@ -204,6 +243,32 @@ String LCBUrl::getHost()
     return host;
 }
 
+IPAddress LCBUrl::getIP()
+{
+    IPAddress returnIP = INADDR_NONE;
+
+    // First try to resolve the address fresh
+    int err = 0;
+    err = WiFi.hostByName(getHost().c_str(), returnIP) ;
+
+    if(err == 1)
+    {
+        ipaddress = returnIP;
+    }
+    else
+    {
+        Serial.print(F("DEBUG: hostByName() failed for "));
+        Serial.print(getHost().c_str());
+        Serial.print(". Error code: (");
+        Serial.print(err);
+        Serial.println(F(")"));
+    }
+    
+    // If we got a new IP address, we will use it.  Otherwise
+    // we will use last known good (if there is one)
+    return ipaddress;
+}
+
 word LCBUrl::getPort()
 {
     // Port will be any integer between : and / in authority
@@ -264,6 +329,39 @@ String LCBUrl::getAuthority()
         }
     }
     return authority;
+}
+
+String LCBUrl::getIPAuthority()
+{
+    if (ipauthority.length() == 0)
+    {
+        ipauthority = "";
+        if (getUserName().length() > 0)
+        {
+            ipauthority = getUserName();
+        }
+        if (getPassword().length() > 0)
+        {
+            ipauthority.concat(F(":"));
+            ipauthority.concat(getPassword());
+        }
+        if (ipauthority.length() > 0)
+        {
+            ipauthority.concat(F("@"));
+        }
+        ipauthority.concat(getIP());
+        if (getPort() > 0)
+        {
+            if (
+                ((getScheme() == F("http")) && (port != 80)) ||
+                ((getScheme() == F("https")) && (port != 443)))
+            {
+                ipauthority.concat(F(":"));
+                ipauthority.concat(String(getPort()));
+            }
+        }
+    }
+    return ipauthority;
 }
 
 String LCBUrl::getPath()
