@@ -33,9 +33,11 @@
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #endif
 #ifdef ESP32
 #include <WiFi.h>
+#include <ESPmDNS.h>
 #endif
 
 #include <string.h>

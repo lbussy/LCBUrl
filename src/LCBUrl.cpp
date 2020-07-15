@@ -246,16 +246,37 @@ IPAddress LCBUrl::getIP()
     IPAddress returnIP = INADDR_NONE;
 
     // First try to resolve the address fresh
-    int err = 0;
-    err = WiFi.hostByName(getHost().c_str(), returnIP) ;
+    if (getHost().endsWith(".local"))
+    { // Host is an mDNS name
+        String hostname = getHost();
+        hostname.remove(hostname.lastIndexOf(".local"));
 
-    if(err == 1)
-    {
-        ipaddress = returnIP;
+        struct ip4_addr addr;
+        addr.addr = 0;
+        esp_err_t err = mdns_query_a(hostname.c_str(), 2000, &addr);
+
+        if (err == ESP_OK)
+        {
+            char ipstring[16];
+            snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
+            returnIP.fromString(ipstring);
+            if (returnIP != INADDR_NONE)
+            {
+                ipaddress = returnIP;
+            }
+        }
+    }
+    else
+    { // Host is not an mDNS name
+        if (WiFi.hostByName(getHost().c_str(), returnIP) == 1)
+        {
+            ipaddress = returnIP;
+        }
     }
     
     // If we got a new IP address, we will use it.  Otherwise
-    // we will use last known good (if there is one)
+    // we will use last known good (if there is one), falls back
+    // to INADDR_NONE
     return ipaddress;
 }
 
