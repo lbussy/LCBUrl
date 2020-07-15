@@ -107,37 +107,35 @@ String LCBUrl::getUrl()
 
 String LCBUrl::getIPUrl()
 {
-    if (url.length() == 0)
+    if (ipurl.length() == 0)
     {
-        url = "";
-        url.concat(getScheme()); // http or https
-        url.concat(F("://"));
-        url.concat(getIPAuthority()); // Username, password, host and port
-        url.concat(F("/"));
-        url.concat(getPath()); // Path
+        ipurl = "";
+        ipurl.concat(getScheme()); // http or https
+        ipurl.concat(F("://"));
+        ipurl.concat(getIPAuthority()); // Username, password, host and port
+        ipurl.concat(F("/"));
+        ipurl.concat(getPath()); // Path
         if (getQuery() != "") // Add a query string
         {
-            url.concat(F("?"));
-            url.concat(getQuery());
+            ipurl.concat(F("?"));
+            ipurl.concat(getQuery());
         }
         if (getFragment() != "") // Add a fragment
         {
-            url.concat(F("#"));
-            url.concat(getFragment());
+            ipurl.concat(F("#"));
+            ipurl.concat(getFragment());
         }
         if ((getScheme() == "") || (getHost() == "")) // No idea what I was thinking here
         {
-            return url;
+            return ipurl;
         }
     }
-    return url;
+    return ipurl;
 }
 
 bool LCBUrl::isMDNS()
 {
     return getHost().endsWith(".local");
-    // Can use following for C++
-    // return host.size() >= suffix.size() && 0 == host.compare(host.size()-suffix.size(), suffix.size(), suffix);
 }
 
 
@@ -227,12 +225,12 @@ String LCBUrl::getHost()
         if (tempUrl)
         {
             int startloc = tempUrl.lastIndexOf(F("@"));
-            if (startloc)
+            if (startloc > 0)
             {
                 tempUrl = tempUrl.substring(startloc + 1, tempUrl.length());
             }
             int endloc = tempUrl.indexOf(F(":"), 0);
-            if (endloc)
+            if (endloc > 0)
             {
                 tempUrl = tempUrl.substring(0, endloc);
             }
@@ -254,14 +252,6 @@ IPAddress LCBUrl::getIP()
     if(err == 1)
     {
         ipaddress = returnIP;
-    }
-    else
-    {
-        Serial.print(F("DEBUG: hostByName() failed for "));
-        Serial.print(getHost().c_str());
-        Serial.print(". Error code: (");
-        Serial.print(err);
-        Serial.println(F(")"));
     }
     
     // If we got a new IP address, we will use it.  Otherwise
@@ -349,7 +339,7 @@ String LCBUrl::getIPAuthority()
         {
             ipauthority.concat(F("@"));
         }
-        ipauthority.concat(getIP());
+        ipauthority.concat(getIP().toString());
         if (getPort() > 0)
         {
             if (
@@ -451,6 +441,10 @@ String LCBUrl::getRawAuthority()
             if (loc > 0)
             {
                 rawauthority = tempUrl.substring(0, loc);
+            }
+            else
+            {
+                rawauthority = tempUrl;
             }
         }
     }
