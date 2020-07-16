@@ -72,7 +72,6 @@ bool LCBUrl::setUrl(const String &newUrl)
     }
     else
     {
-        getIP(); // We neeed to try this up front and pre-cache
         return true;
     }
 }
