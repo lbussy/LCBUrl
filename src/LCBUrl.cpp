@@ -38,6 +38,7 @@ LCBUrl::LCBUrl()
 {
     rawurl = "";
     url = "";
+    ipurl = "";
     workingurl = "";
     scheme = "";
     stripscheme = "";
@@ -47,8 +48,10 @@ LCBUrl::LCBUrl()
     username = "";
     password = "";
     host = "";
+    ipaddress = INADDR_NONE;
     port = 65535;
     authority = "";
+    ipauthority = "";
     pathsegment = "";
     path = "";
     removedotsegments = "";
@@ -75,7 +78,6 @@ bool LCBUrl::setUrl(const String &newUrl)
 
 String LCBUrl::getUrl()
 {
-
     if (url.length() == 0)
     {
         url = "";
@@ -101,6 +103,40 @@ String LCBUrl::getUrl()
     }
     return url;
 }
+
+String LCBUrl::getIPUrl()
+{
+    if (ipurl.length() == 0)
+    {
+        ipurl = "";
+        ipurl.concat(getScheme()); // http or https
+        ipurl.concat(F("://"));
+        ipurl.concat(getIPAuthority()); // Username, password, host and port
+        ipurl.concat(F("/"));
+        ipurl.concat(getPath()); // Path
+        if (getQuery() != "") // Add a query string
+        {
+            ipurl.concat(F("?"));
+            ipurl.concat(getQuery());
+        }
+        if (getFragment() != "") // Add a fragment
+        {
+            ipurl.concat(F("#"));
+            ipurl.concat(getFragment());
+        }
+        if ((getScheme() == "") || (getHost() == "")) // No idea what I was thinking here
+        {
+            return ipurl;
+        }
+    }
+    return ipurl;
+}
+
+bool LCBUrl::isMDNS()
+{
+    return getHost().endsWith(".local");
+}
+
 
 String LCBUrl::getScheme()
 { // Currrently only finds http and https as scheme
@@ -188,12 +224,12 @@ String LCBUrl::getHost()
         if (tempUrl)
         {
             int startloc = tempUrl.lastIndexOf(F("@"));
-            if (startloc)
+            if (startloc > 0)
             {
                 tempUrl = tempUrl.substring(startloc + 1, tempUrl.length());
             }
             int endloc = tempUrl.indexOf(F(":"), 0);
-            if (endloc)
+            if (endloc > 0)
             {
                 tempUrl = tempUrl.substring(0, endloc);
             }
@@ -202,6 +238,45 @@ String LCBUrl::getHost()
     }
     host.toLowerCase();
     return host;
+}
+
+IPAddress LCBUrl::getIP()
+{
+    IPAddress returnIP = INADDR_NONE;
+
+    // First try to resolve the address fresh
+    if (getHost().endsWith(".local"))
+    { // Host is an mDNS name
+        String hostname = getHost();
+        hostname.remove(hostname.lastIndexOf(".local"));
+
+        struct ip4_addr addr;
+        addr.addr = 0;
+        esp_err_t err = mdns_query_a(hostname.c_str(), 2000, &addr);
+
+        if (err == ESP_OK)
+        {
+            char ipstring[16];
+            snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
+            returnIP.fromString(ipstring);
+            if (returnIP != INADDR_NONE)
+            {
+                ipaddress = returnIP;
+            }
+        }
+    }
+    else
+    { // Host is not an mDNS name
+        if (WiFi.hostByName(getHost().c_str(), returnIP) == 1)
+        {
+            ipaddress = returnIP;
+        }
+    }
+    
+    // If we got a new IP address, we will use it.  Otherwise
+    // we will use last known good (if there is one), falls back
+    // to INADDR_NONE
+    return ipaddress;
 }
 
 word LCBUrl::getPort()
@@ -264,6 +339,46 @@ String LCBUrl::getAuthority()
         }
     }
     return authority;
+}
+
+String LCBUrl::getIPAuthority()
+{
+    if (ipauthority.length() == 0)
+    {
+        ipauthority = "";
+        if (getUserName().length() > 0)
+        {
+            ipauthority = getUserName();
+        }
+        if (getPassword().length() > 0)
+        {
+            ipauthority.concat(F(":"));
+            ipauthority.concat(getPassword());
+        }
+        if (ipauthority.length() > 0)
+        {
+            ipauthority.concat(F("@"));
+        }
+        if (ipaddress == INADDR_NONE)
+        {
+            ipauthority.concat(getIP().toString());
+        }
+        else
+        {
+            ipauthority.concat(ipaddress.toString());
+        }
+        if (getPort() > 0)
+        {
+            if (
+                ((getScheme() == F("http")) && (port != 80)) ||
+                ((getScheme() == F("https")) && (port != 443)))
+            {
+                ipauthority.concat(F(":"));
+                ipauthority.concat(String(getPort()));
+            }
+        }
+    }
+    return ipauthority;
 }
 
 String LCBUrl::getPath()
@@ -353,6 +468,10 @@ String LCBUrl::getRawAuthority()
             if (loc > 0)
             {
                 rawauthority = tempUrl.substring(0, loc);
+            }
+            else
+            {
+                rawauthority = tempUrl;
             }
         }
     }
@@ -450,11 +569,17 @@ String LCBUrl::getPathSegment()
     if (pathsegment.length() == 0)
     {
         String tempUrl = getStripScheme();
+
         int startloc = tempUrl.indexOf(F("/"));
-        if (startloc)
+        if (startloc > 0)
         {
             tempUrl = tempUrl.substring(startloc + 1);
         }
+        else
+        {
+            tempUrl = "";
+        }
+
         int endloc = tempUrl.lastIndexOf(F("?"));
         if (endloc != -1)
         {
@@ -468,6 +593,7 @@ String LCBUrl::getPathSegment()
                 tempUrl = tempUrl.substring(0, endloc - 1);
             }
         }
+
         unsigned int lastpath = tempUrl.lastIndexOf(F("/"));
         if ((lastpath) && (lastpath < tempUrl.length()))
         { // Filename exists
