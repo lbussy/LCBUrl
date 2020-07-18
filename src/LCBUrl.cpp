@@ -359,7 +359,14 @@ String LCBUrl::getIPAuthority()
         {
             ipauthority.concat(F("@"));
         }
-        ipauthority.concat(getIP().toString());
+        if (ipaddress == INADDR_NONE)
+        {
+            ipauthority.concat(getIP().toString());
+        }
+        else
+        {
+            ipauthority.concat(ipaddress.toString());
+        }
         if (getPort() > 0)
         {
             if (
