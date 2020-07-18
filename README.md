@@ -2,26 +2,28 @@
 
 This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy, but if not, I'm still using it in my projects.
 
-This library will parse a url, and normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).  For instance; passing in `http://%7EFoo:%7Ep@$$word@servername.local:80/%7Ethis/is/a/./path/test.php?foo=bar#frag` will allow you to access the hostname, user name, password, path, query string, fragment, etc. as follows:
+This library will parse a URL, and normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).  For instance, passing in `http://%7EFoo:%7Ep@$$word@servername.local:80/%7Ethis/is/a/./path/test.php?foo=bar#frag` will allow you to access the hostname, user name, password, path, query string, fragment, etc..
+
+If you are using mDNS in your projects, you may have discovered many microcontroller libraries do not support mDNS in all areas.  This library will additionally re-parse a URL and replace the `*.local` hostname with the resolved IP address.
 
 - getUrl() = http://~Foo:~p@$$word@<span/>servername.local/~this/is/a/./path/test.php?foo=bar#frag
-- getIPUrl() = http://~Foo:~p@$$word@<span/>192.168.0.1/~this/is/a/./path/test.php?foo=bar#frag
+- getIPUrl() = http://~Foo:~p@$$word@<span/>XXX.XXX.XXX.XXX/~this/is/a/./path/test.php?foo=bar#frag
 - getScheme() = http
 - getUserInfo() = ~Foo:~p@$$word
 - getUserName() = ~Foo
 - getPassword() = ~p@$$word
 - getHost() = servername.local
-- getIP() = 192.168.0.1
+- getIP() = XXX.XXX.XXX.XXX
 - getPort() = 80
 - getAuthority() = ~Foo:~p@$$word@<span/>servername.local
-- getIPAuthority() = ~Foo:~p@$$word@<span/>192.168.0.1
+- getIPAuthority() = ~Foo:~p@$$word@<span/>XXX.XXX.XXX.XXX
 - getPath() = ~this/is/a/./path/test.php
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = foo=bar
 - getFragment() = frag
 - isMDNS
 
-:exclamation: IMPORTANT: Using any of the IP-based methods in a timer will crash or hang your program. This is not a shortcoming of the library, it is how radio-functions (networking being one) work.
+:exclamation: IMPORTANT: Using any of the IP-based methods in a timer will crash or hang your program. This hang is not a shortcoming of this library; it is how radio-functions (networking being one) work.
 
 ## Public Methods
 
@@ -34,10 +36,10 @@ This library will parse a url, and normalize it according to the information pro
 - `String getUserName()` - Returns username (if present)
 - `String getPassword()` - Returns password (if present)
 - `String getHost()` - Return host name
-- `String getIP()` - Return IP address of host
+- `String getIP()` - Return IP address of host (always does lookup)
 - `word getPort()` - Return port (if present) if non-standard
 - `String getAuthority()` - Return the authority (if present) in the following format: `[userinfo@]host[:port]`
-- `String getIPAuthority()` - Return the authority (if present) in the following format: `[userinfo@]XXX.XXX.XXX.XXX[:port]` (useful for mDNS URLs)
+- `String getIPAuthority()` - Return the authority (if present) in the following format: `[userinfo@]XXX.XXX.XXX.XXX[:port]` (useful for mDNS URLs, will use cached IPs if they exist)
 - `String getPath()` - Returns the path segment (if present) with any query or fragment removed
 - `String getAfterPath()` - Returns query and fragment segments (if present)
 - `String getQuery()` - Returns query (if present)
@@ -56,31 +58,41 @@ This library will parse a url, and normalize it according to the information pro
 ## Installation
 --------------------------------------------------------------------------------
 
-To install this library, place this entire folder as a subfolder in your
-Arduino/lib/targets/libraries folder.
+### PlatformIO
+----------------------
 
-When installed, this library should look like:
+This library is available as `LCBUrl` in PlatformIO's library manager.
+
+### Arduino IDE
+------------------------
+
+LCBUrl is published via the Arduino Library Manager.  You can include this library in your project by navigating to Sketch -> Include Libraries -> Manage Libraries (or Ctrl - Shift - I). Type `LCBUrl` in the search bar:
+
+![Arduino Library Manager](https://github.com/lbussy/LCBUrl/raw/mdns_handling/resources/arduino_library_manager.png)
+
+### Manual
+----------------------
+
+To install this library, place this entire folder as a subfolder in your
+`./lib/targets/libraries` folder.
+
+When installed, this library should contain the following files:
 
 ```
-Arduino/lib/targets/libraries/LCBUrl                    (this library's folder)
-Arduino/lib/targets/libraries/LCBUrl/examples           (the examples in the "open" menu)
-Arduino/lib/targets/libraries/LCBUrl/keywords.txt       (the syntax coloring file)
-Arduino/lib/targets/libraries/LCBUrl/library.properties (properties of this libraary)
-Arduino/lib/targets/libraries/LCBUrl/LICENSE            (the license for this library)
-Arduino/lib/targets/libraries/LCBUrl/README.md          (this file)
-Arduino/lib/targets/libraries/LCBUrl/src/LCBUrl.cpp     (the library implementation file)
-Arduino/lib/targets/libraries/LCBUrl/src/LCBUrl.h       (the library description file)
+./lib/targets/libraries/LCBUrl                    (this library's folder)
+./lib/targets/libraries/LCBUrl/examples           (the examples in the "open" menu)
+./lib/targets/libraries/LCBUrl/keywords.txt       (the syntax coloring file)
+./lib/targets/libraries/LCBUrl/library.properties (properties of this libraary)
+./lib/targets/libraries/LCBUrl/LICENSE            (the license for this library)
+./lib/targets/libraries/LCBUrl/README.md          (this file)
+./lib/targets/libraries/LCBUrl/src/LCBUrl.cpp     (the library implementation file)
+./lib/targets/libraries/LCBUrl/src/LCBUrl.h       (the library description file)
 ```
 
 ## Building
 --------------------------------------------------------------------------------
 
-After you install this library, you are done. 
-
-You may see a few warning messages as is builds.
-
-To use this library in a sketch, go to the Sketch | Import Library menu and
-select LCBUrl.  Selecting the library will add a corresponding line to the top of your sketch:
+Ensure that you add a corresponding line to the top of your sketch:
 
 `#include <LCBUrl.h>`
 
