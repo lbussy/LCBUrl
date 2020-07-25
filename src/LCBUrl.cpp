@@ -250,6 +250,17 @@ IPAddress LCBUrl::getIP()
         String hostname = getHost();
         hostname.remove(hostname.lastIndexOf(".local"));
 
+#ifdef ESP8266
+        int result = WiFi.hostByName(hostname.c_str(), returnIP);
+
+        if (result == 1)
+        {
+            if (returnIP != INADDR_NONE)
+            {
+                ipaddress = returnIP;
+            }
+        }
+#else
         struct ip4_addr addr;
         addr.addr = 0;
         esp_err_t err = mdns_query_a(hostname.c_str(), 2000, &addr);
@@ -264,6 +275,7 @@ IPAddress LCBUrl::getIP()
                 ipaddress = returnIP;
             }
         }
+#endif
     }
     else
     { // Host is not an mDNS name
