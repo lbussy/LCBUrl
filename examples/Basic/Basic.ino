@@ -36,7 +36,7 @@ void setup() {
     delay(1000);
     Serial.println(F("Starting test run of LCBUrl:"));
 
-    String myUrl = "http://%7EFoo:%7Ep@$$word@servername.local:80/%7Ethis/is/a/./path/test.php?foo=bar#frag";
+    String myUrl = "http://%7EFoo:%7Ep@$$wOrd@Servername.local:80/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
     LCBUrl url;
 
     if (!url.setUrl(myUrl)) {
