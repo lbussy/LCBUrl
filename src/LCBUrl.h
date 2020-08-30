@@ -31,6 +31,15 @@
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#endif
+#ifdef ESP32
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#endif
+
 #include <string.h>
 #include <Arduino.h>
 
@@ -42,14 +51,18 @@ public:
     LCBUrl();
     ~LCBUrl(){};
     bool setUrl(const String &);
+    bool isMDNS();
     String getUrl();
+    String getIPUrl();
     String getScheme();
     String getUserInfo();
     String getUserName();
     String getPassword();
     String getHost();
+    IPAddress getIP();
     word getPort();
     String getAuthority();
+    String getIPAuthority();
     String getPath();
     String getAfterPath();
     String getQuery();
@@ -65,6 +78,7 @@ private:
     String getPathSegment();
     String rawurl;
     String url;
+    String ipurl;
     String workingurl;
     String scheme;
     String stripscheme;
@@ -74,8 +88,10 @@ private:
     String username;
     String password;
     String host;
+    IPAddress ipaddress;
     word port;
     String authority;
+    String ipauthority;
     String pathsegment;
     String path;
     String removedotsegments;
