@@ -273,7 +273,7 @@ String LCBUrl::getPath()
         path = getPathSegment();
         // TODO: Remove dot segments per 5.2.4
     }
-    path.toLowerCase();
+    //path.toLowerCase(); // Remove per #11
     return path;
 }
 
