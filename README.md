@@ -53,7 +53,7 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - [ ] Remove dot-segments
 - [X] Convert an empty path to a "/" path
 - [X] Remove the default port
-- [X] Add a trailing "/" to a non-empty path (may remove this)
+- ~~[X] Add a trailing "/" to a non-empty path (may remove this)~~ (removed this after some thought)
 
 ## Installation
 --------------------------------------------------------------------------------

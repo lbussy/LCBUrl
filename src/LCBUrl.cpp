@@ -577,7 +577,6 @@ String LCBUrl::getCleanTriplets()
 String LCBUrl::getPathSegment()
 {
     // Path will be between the / after host and ?
-    // Add a trailing slash if no filename given
     if (pathsegment.length() == 0)
     {
         String tempUrl = getStripScheme();
@@ -603,16 +602,6 @@ String LCBUrl::getPathSegment()
             if (endloc != -1)
             {
                 tempUrl = tempUrl.substring(0, endloc - 1);
-            }
-        }
-
-        unsigned int lastpath = tempUrl.lastIndexOf(F("/"));
-        if ((lastpath) && (lastpath < tempUrl.length()))
-        { // Filename exists
-            int dotloc = tempUrl.lastIndexOf(F("."));
-            if ((dotloc == -1 || dotloc < (int)lastpath) && !tempUrl.endsWith(F("/")))
-            {
-                tempUrl.concat(F("/"));
             }
         }
         pathsegment = tempUrl;
