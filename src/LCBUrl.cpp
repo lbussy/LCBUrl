@@ -610,7 +610,7 @@ String LCBUrl::getPathSegment()
         if ((lastpath) && (lastpath < tempUrl.length()))
         { // Filename exists
             int dotloc = tempUrl.lastIndexOf(F("."));
-            if ((dotloc == -1) || ((dotloc < (int)lastpath) && (!tempUrl.endsWith(F("/")))))
+            if ((dotloc == -1 || dotloc < (int)lastpath) && !tempUrl.endsWith(F("/")))
             {
                 tempUrl.concat(F("/"));
             }
