@@ -1,5 +1,12 @@
 # LCBUrl - An Arduino library for handling URLs
 
+[![Arduino Library](https://www.ardu-badge.com/badge/LCBUrl.svg?style=plastic)](https://www.ardu-badge.com/LCBUrl)
+[![GitHub Release](https://img.shields.io/github/v/release/lbussy/LCBUrl.svg?style=plastic)](https://github.com/lbussy/LCBUrl/releases)
+[![MIT License](https://img.shields.io/github/license/lbussy/LCBUrl?style=plastic)](https://github.com/lbussy/LCBUrl/blob/master/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/pulls)
+[![Contributors Welsome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](#Contributing)
+
 This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy, but if not, I'm still using it in my projects.
 
 This library will parse a URL, and normalize it according to the information provided in [RFC3986](https://tools.ietf.org/html/rfc3986).  For instance, passing in `http://%7EFoo:%7Ep@$$word@servername.local:80/%7Ethis/is/a/./path/test.php?foo=bar#frag` will allow you to access the hostname, user name, password, path, query string, fragment, etc..
@@ -56,22 +63,18 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - [X] ~~Add a trailing "/" to a non-empty path (may remove this)~~ (removed this after some thought)
 
 ## Installation
---------------------------------------------------------------------------------
+
+Instalation is particular to the platform with which you are developing:
 
 ### PlatformIO
-----------------------
 
-This library is available as `LCBUrl` in PlatformIO's library manager.
+This library is available as `LCBUrl` in [PlatformIO's library manager](https://platformio.org/lib/show/6778/LCBUrl).
 
 ### Arduino IDE
-------------------------
 
-LCBUrl is published via the Arduino Library Manager.  You can include this library in your project by navigating to Sketch -> Include Libraries -> Manage Libraries (or Ctrl - Shift - I). Type `LCBUrl` in the search bar:
-
-![Arduino Library Manager](https://github.com/lbussy/LCBUrl/raw/mdns_handling/resources/arduino_library_manager.png)
+LCBUrl is published via the [Arduino Library Manager](https://www.ardu-badge.com/LCBUrl).  You can include this library in your project by navigating to Sketch -> Include Libraries -> Manage Libraries (or Ctrl - Shift - I). Type `LCBUrl` in the search bar:
 
 ### Manual
-----------------------
 
 To install this library, place this entire folder as a subfolder in your
 `./lib/targets/libraries` folder.
@@ -97,3 +100,23 @@ Ensure that you add a corresponding line to the top of your sketch:
 `#include <LCBUrl.h>`
 
 To stop using this library, delete that line from your sketch.
+
+## Contributing
+--------------------------------------------
+
+If you would like to contribute to this project:
+
+- Report bugs and errors
+- Ask for enhancements
+- Create issues and pull requests
+- Tell other people about this library
+
+
+## License
+--------------------------------------------
+
+The library is licensed under the [MIT License](https://github.com/lbussy/LCBUrl/blob/master/LICENSE).
+
+
+## Copyright
+--------------------------------------------
