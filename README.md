@@ -93,7 +93,6 @@ When installed, this library should contain the following files:
 ```
 
 ## Building
---------------------------------------------------------------------------------
 
 Ensure that you add a corresponding line to the top of your sketch:
 
@@ -102,7 +101,6 @@ Ensure that you add a corresponding line to the top of your sketch:
 To stop using this library, delete that line from your sketch.
 
 ## Contributing
---------------------------------------------
 
 If you would like to contribute to this project:
 
@@ -113,10 +111,10 @@ If you would like to contribute to this project:
 
 
 ## License
---------------------------------------------
 
 The library is licensed under the [MIT License](https://github.com/lbussy/LCBUrl/blob/master/LICENSE).
 
 
 ## Copyright
---------------------------------------------
+
+LCBUrl is Copyright &copy; 2020 by Lee C Bussy.
