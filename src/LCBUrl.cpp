@@ -306,7 +306,7 @@ word LCBUrl::getPort()
                 tempUrl = tempUrl.substring(startloc + 1);
             if (endloc != -1)
                 tempUrl = tempUrl.substring(0, endloc - 1);
-            if ((startloc != -1) && (endloc != -1))
+            if (startloc != -1)
                 port = tempUrl.toDouble();
         }
     }
