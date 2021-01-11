@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/github/license/lbussy/LCBUrl?style=plastic)](https://github.com/lbussy/LCBUrl/blob/master/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/pulls)
-[![Contributors Welsome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](#Contributing)
+[![Contributors Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](#Contributing)
 
 This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy, but if not, I'm still using it in my projects.
 
@@ -28,7 +28,7 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = foo=bar
 - getFragment() = frag
-- isMDNS
+- isMDNS() = Boolean
 
 :exclamation: IMPORTANT: Using any of the IP-based methods in a timer will crash or hang your program. This hang is not a shortcoming of this library; it is how radio-functions (networking being one) work.
 
@@ -64,7 +64,7 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 
 ## Installation
 
-Instalation is particular to the platform with which you are developing:
+Installation is particular to the platform with which you are developing:
 
 ### PlatformIO
 
@@ -85,7 +85,7 @@ When installed, this library should contain the following files:
 ./lib/targets/libraries/LCBUrl                    (this library's folder)
 ./lib/targets/libraries/LCBUrl/examples           (the examples in the "open" menu)
 ./lib/targets/libraries/LCBUrl/keywords.txt       (the syntax coloring file)
-./lib/targets/libraries/LCBUrl/library.properties (properties of this libraary)
+./lib/targets/libraries/LCBUrl/library.properties (properties of this library)
 ./lib/targets/libraries/LCBUrl/LICENSE            (the license for this library)
 ./lib/targets/libraries/LCBUrl/README.md          (this file)
 ./lib/targets/libraries/LCBUrl/src/LCBUrl.cpp     (the library implementation file)
