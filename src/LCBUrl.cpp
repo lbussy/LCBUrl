@@ -34,30 +34,11 @@
 // Constructor/Destructor ////////////////////////////////////////////////
 // Handle the creation, setup, and destruction of instances
 
-LCBUrl::LCBUrl()
+LCBUrl::LCBUrl(const String &newUrl)
 {
-    rawurl = "";
-    url = "";
-    ipurl = "";
-    workingurl = "";
-    scheme = "";
-    stripscheme = "";
-    rawauthority = "";
-    afterauth = "";
-    userinfo = "";
-    username = "";
-    password = "";
-    host = "";
-    ipaddress = INADDR_NONE;
-    port = 65535;
-    authority = "";
-    ipauthority = "";
-    pathsegment = "";
-    path = "";
-    removedotsegments = "";
-    afterpath = "";
-    query = "";
-    fragment = "";
+    initRegisters();
+    if (newUrl.length() > 0)
+        setUrl(newUrl);
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -65,18 +46,23 @@ LCBUrl::LCBUrl()
 
 bool LCBUrl::setUrl(const String &newUrl)
 {
-    rawurl = newUrl;
-    if (getUrl().length() == 0)
+    bool retVal = false;
+    if (newUrl.length() > 0)
     {
-        return false;
+        initRegisters();
+        rawurl = newUrl;
     }
-    else
+    if (rawurl.length() != 0)
     {
-        return true;
+        if (getUrl().length() != 0)
+        {
+            retVal = true;
+        }
     }
+    return retVal;
 }
 
-String LCBUrl::getUrl()
+String LCBUrl::getUrl() // Returned parsed/normalized URL
 {
     if (url.length() == 0)
     {
@@ -104,7 +90,7 @@ String LCBUrl::getUrl()
     return url;
 }
 
-String LCBUrl::getIPUrl()
+String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
 {
     if (ipurl.length() == 0)
     {
@@ -132,13 +118,12 @@ String LCBUrl::getIPUrl()
     return ipurl;
 }
 
-bool LCBUrl::isMDNS()
+bool LCBUrl::isMDNS() // Determine if FQDN is mDNS
 {
     return getHost().endsWith(".local");
 }
 
-
-String LCBUrl::getScheme()
+String LCBUrl::getScheme() // Returns URL scheme
 { // Currrently only finds http and https as scheme
     if (scheme.length() == 0)
     {
@@ -157,7 +142,7 @@ String LCBUrl::getScheme()
     return scheme;
 }
 
-String LCBUrl::getUserInfo()
+String LCBUrl::getUserInfo() // Return username:passsword
 {
     // UserInfo will be anything to the left of the last @ in authority
     if (userinfo.length() == 0)
@@ -176,7 +161,7 @@ String LCBUrl::getUserInfo()
     return userinfo;
 }
 
-String LCBUrl::getUserName()
+String LCBUrl::getUserName() // Return username from authority
 {
     // User Name will be anything to the left of : in userinfo
     if (username.length() == 0)
@@ -195,7 +180,7 @@ String LCBUrl::getUserName()
     return username;
 }
 
-String LCBUrl::getPassword()
+String LCBUrl::getPassword() // Return password from authority
 {
     // Password will be anything to the right of : in userinfo
     if (password.length() == 0)
@@ -214,7 +199,7 @@ String LCBUrl::getPassword()
     return password;
 }
 
-String LCBUrl::getHost()
+String LCBUrl::getHost() // Return FQDN
 {
     // Host will be anything between @ and : or / in authority
     if (host.length() == 0)
@@ -240,7 +225,7 @@ String LCBUrl::getHost()
     return host;
 }
 
-IPAddress LCBUrl::getIP()
+IPAddress LCBUrl::getIP() // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = INADDR_NONE;
 
@@ -291,12 +276,10 @@ IPAddress LCBUrl::getIP()
     return ipaddress;
 }
 
-word LCBUrl::getPort()
+unsigned int LCBUrl::getPort() // Port will be any integer between : and / in authority
 {
-    // Port will be any integer between : and / in authority
-    if (port == 65535)
+    if (port == 0)
     {
-        port = 0;
         String tempUrl = getRawAuthority();
         if (tempUrl.length() > 0)
         {
@@ -307,7 +290,7 @@ word LCBUrl::getPort()
             if (endloc != -1)
                 tempUrl = tempUrl.substring(0, endloc - 1);
             if (startloc != -1)
-                port = tempUrl.toDouble();
+                port = tempUrl.toInt();
         }
     }
     if (port == 0)
@@ -320,7 +303,7 @@ word LCBUrl::getPort()
     return port;
 }
 
-String LCBUrl::getAuthority()
+String LCBUrl::getAuthority() // Return username:password@fqdn:port
 {
     if (authority.length() == 0)
     {
@@ -353,7 +336,7 @@ String LCBUrl::getAuthority()
     return authority;
 }
 
-String LCBUrl::getIPAuthority()
+String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (optional)}@{fqdn}
 {
     if (ipauthority.length() == 0)
     {
@@ -393,18 +376,17 @@ String LCBUrl::getIPAuthority()
     return ipauthority;
 }
 
-String LCBUrl::getPath()
+String LCBUrl::getPath() // Get all after host and port, before query and frag
 {
     if (path.length() == 0)
     {
         path = getPathSegment();
         // TODO: Remove dot segments per 5.2.4
     }
-    //path.toLowerCase(); // Remove per #11
     return path;
 }
 
-String LCBUrl::getQuery()
+String LCBUrl::getQuery() // Get text after '?' and before '#'
 {
     if (query.length() == 0)
     {
@@ -419,7 +401,7 @@ String LCBUrl::getQuery()
     return query;
 }
 
-String LCBUrl::getFragment()
+String LCBUrl::getFragment() // Get all after '#'
 {
     if (fragment.length() == 0)
     {
@@ -437,8 +419,8 @@ String LCBUrl::getFragment()
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
 
-String LCBUrl::getStripScheme()
-{ // Remove scheme and "://" discriminately
+String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
+{
     if (stripscheme.length() == 0)
     {
         stripscheme = "";
@@ -467,9 +449,8 @@ String LCBUrl::getStripScheme()
     return stripscheme;
 }
 
-String LCBUrl::getRawAuthority()
+String LCBUrl::getRawAuthority() // Authority is similar to "lbussy@raspberrypi.local:80"
 {
-    // Authority is similar to "lbussy@raspberrypi.local:80"
     if (rawauthority.length() == 0)
     {
         rawauthority = "";
@@ -490,8 +471,8 @@ String LCBUrl::getRawAuthority()
     return rawauthority;
 }
 
-String LCBUrl::getAfterAuth()
-{ // Get anything after the authority
+String LCBUrl::getAfterAuth() // Get anything after the authority
+{
     if (afterauth.length() == 0)
     {
         afterauth = "";
@@ -507,8 +488,8 @@ String LCBUrl::getAfterAuth()
     return afterauth;
 }
 
-String LCBUrl::getAfterPath()
-{ // Get anything after the path
+String LCBUrl::getAfterPath() // Get anything after the path
+{
     if (afterpath.length() == 0)
     {
         afterpath = "";
@@ -530,53 +511,49 @@ String LCBUrl::getAfterPath()
     return afterpath;
 }
 
-String LCBUrl::getCleanTriplets()
+String LCBUrl::getCleanTriplets() // Convert URL encoded triplets
 {
-    if (workingurl.length() == 0)
+    workingurl = rawurl;
+    unsigned int i = workingurl.length();
+    while (i != 0)
     {
-        workingurl = rawurl;
-        unsigned int i = workingurl.length();
-        while (i != 0)
+        int loc = workingurl.lastIndexOf(F("%"), i);
+        if (loc != -1)
         {
-            int loc = workingurl.lastIndexOf(F("%"), i);
-            if (loc != -1)
-            {
-                String triplet = rawurl.substring(loc + 1, loc + 3);
-                triplet.toUpperCase();
-                const char *hex = triplet.c_str();
+            String triplet = rawurl.substring(loc + 1, loc + 3);
+            triplet.toUpperCase();
+            const char *hex = triplet.c_str();
 
-                // Convert hex string to a character
-                int x;
-                char *endptr;
-                x = strtol(hex, &endptr, 16);
-                char character = char(x);
+            // Convert hex string to a character
+            int x;
+            char *endptr;
+            x = strtol(hex, &endptr, 16);
+            char character = char(x);
 
-                // Check for characters which should be decoded
-                if (
-                    (isAlphaNumeric(character)) ||
-                    (character == '-') ||
-                    (character == '.') ||
-                    (character == '_') ||
-                    (character == '~'))
-                {
-                    String before = workingurl.substring(0, loc);
-                    String after = workingurl.substring(loc + 3);
-                    workingurl = before + character + after;
-                }
-                i--;
-            }
-            else
+            // Check for characters which should be decoded
+            if (
+                (isAlphaNumeric(character)) ||
+                (character == '-') ||
+                (character == '.') ||
+                (character == '_') ||
+                (character == '~'))
             {
-                i = 0;
+                String before = workingurl.substring(0, loc);
+                String after = workingurl.substring(loc + 3);
+                workingurl = before + character + after;
             }
+            i--;
+        }
+        else
+        {
+            i = 0;
         }
     }
     return workingurl;
 }
 
-String LCBUrl::getPathSegment()
+String LCBUrl::getPathSegment() // Path will be between the / after host and ?
 {
-    // Path will be between the / after host and ?
     if (pathsegment.length() == 0)
     {
         String tempUrl = getStripScheme();
@@ -607,4 +584,30 @@ String LCBUrl::getPathSegment()
         pathsegment = tempUrl;
     }
     return pathsegment;
+}
+
+void LCBUrl::initRegisters() // Clear out the internals to allow the object to be re-used
+{
+    rawurl = "";
+    url = "";
+    ipurl = "";
+    workingurl = "";
+    scheme = "";
+    stripscheme = "";
+    rawauthority = "";
+    afterauth = "";
+    userinfo = "";
+    username = "";
+    password = "";
+    host = "";
+    ipaddress = INADDR_NONE;
+    port = 0;
+    authority = "";
+    ipauthority = "";
+    pathsegment = "";
+    path = "";
+    removedotsegments = "";
+    afterpath = "";
+    query = "";
+    fragment = "";
 }

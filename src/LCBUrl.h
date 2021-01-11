@@ -48,9 +48,9 @@ class LCBUrl
 {
     // User-accessible "public" interface
 public:
-    LCBUrl();
+    LCBUrl(const String &newUrl = "");
     ~LCBUrl(){};
-    bool setUrl(const String &);
+    bool setUrl(const String &newUrl);
     bool isMDNS();
     String getUrl();
     String getIPUrl();
@@ -60,7 +60,7 @@ public:
     String getPassword();
     String getHost();
     IPAddress getIP();
-    word getPort();
+    unsigned int getPort();
     String getAuthority();
     String getIPAuthority();
     String getPath();
@@ -89,7 +89,7 @@ private:
     String password;
     String host;
     IPAddress ipaddress;
-    word port;
+    unsigned int port;
     String authority;
     String ipauthority;
     String pathsegment;
@@ -98,6 +98,7 @@ private:
     String afterpath;
     String query;
     String fragment;
+    void initRegisters();
 };
 
 #endif // _LCBURL_H
