@@ -31,45 +31,41 @@
 #include <LCBUrl.h>
 #include <Arduino.h>
 
+// LCBUrl does not require ArduinoLog.  It is used to
+// facilitate the examples.
+#include <ArduinoLog.h>
+#define LOG_LEVEL LOG_LEVEL_VERBOSE
+
 void setup() {
     Serial.begin(BAUD);
-    delay(1000);
-    Serial.println(F("Starting test run of LCBUrl:"));
+    Serial.println();
+    Serial.flush();
+    Log.begin(LOG_LEVEL, &Serial, true);
+    Log.notice(F("Starting test run of LCBUrl." CR CR));
 
     String myUrl = "http://%7EFoo:%7Ep@$$wOrd@Servername.local:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
     LCBUrl url;
 
     if (!url.setUrl(myUrl)) {
-        Serial.println(F("Failure in setUrl();"));
+        Log.fatal(F("Failure in setUrl();" CR));
     } else {
-        Serial.println(F("Return from setUrl():"));
-        Serial.print(F("\tgetUrl(); = "));
-        Serial.println(url.getUrl().c_str());
-        Serial.print(F("\tgetScheme(); = "));
-        Serial.println(url.getScheme().c_str());
-        Serial.print(F("\tgetUserInfo(); = "));
-        Serial.println(url.getUserInfo().c_str());
-        Serial.print(F("\tgetUserName(); = "));
-        Serial.println(url.getUserName().c_str());
-        Serial.print(F("\tgetPassword(); = "));
-        Serial.println(url.getPassword().c_str());
-        Serial.print(F("\tgetHost(); = "));
-        Serial.println(url.getHost().c_str());
-        Serial.print(F("\tgetPort(); = "));
-        Serial.println(url.getPort());
-        Serial.print(F("\tgetAuthority(); = "));
-        Serial.println(url.getAuthority().c_str());
-        Serial.print(F("\tgetPath(); = "));
-        Serial.println(url.getPath().c_str());
-        Serial.print(F("\tgetAfterPath(); = "));
-        Serial.println(url.getAfterPath().c_str());
-        Serial.print(F("\tgetQuery(); = "));
-        Serial.println(url.getQuery().c_str());
-        Serial.print(F("\tgetFragment(); = "));
-        Serial.println(url.getFragment().c_str());
+        Log.notice(F("Return from setUrl():" CR));
+
+        Log.notice(F("\tgetUrl(); = %s" CR), url.getUrl().c_str());
+        Log.notice(F("\tgetScheme(); = %s" CR), url.getScheme().c_str());
+        Log.notice(F("\tgetUserInfo(); = %s" CR), url.getUserInfo().c_str());
+        Log.notice(F("\tgetUserName(); = %s" CR), url.getUserName().c_str());
+        Log.notice(F("\tgetPassword(); = %s" CR), url.getPassword().c_str());
+        Log.notice(F("\tgetHost(); = %s" CR), url.getHost().c_str());
+        Log.notice(F("\tgetPort(); = %l" CR), url.getPort());
+        Log.notice(F("\tgetAuthority(); = %s" CR), url.getAuthority().c_str());
+        Log.notice(F("\tgetPath(); = %s" CR), url.getPath().c_str());
+        Log.notice(F("\tgetAfterPath(); = %s" CR), url.getAfterPath().c_str());
+        Log.notice(F("\tgetQuery(); = %s" CR), url.getQuery().c_str());
+        Log.notice(F("\tgetFragment(); = %s" CR CR), url.getFragment().c_str());
     }
 
-    Serial.println(F("LCBUrl test run complete."));
+    Log.notice(F("LCBUrl test run complete." CR));
 }
 
 void loop() {
