@@ -31,25 +31,47 @@
 #include <LCBUrl.h>
 #include <Arduino.h>
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#endif
+#ifdef ESP32
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#endif
+
 // LCBUrl does not require ArduinoLog.  It is used to
 // facilitate the examples.
 #include <ArduinoLog.h>
 #define LOG_LEVEL LOG_LEVEL_VERBOSE
 
+const char* ssid = "ssid";
+const char* password = "password";
+
 void setup() {
     Serial.begin(BAUD);
     Serial.println();
     Serial.flush();
-    Log.begin(LOG_LEVEL, &Serial, true);
+    Log.begin(LOG_LEVEL, &Serial, false);
     Log.notice(F("Starting test run of LCBUrl." CR CR));
 
-    String myUrl = "http://%7EFoo:%7Ep@$$wOrd@Servername.local:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(1000);
+        Log.notice(F("Establishing connection to WiFi." CR));
+    }
+    Log.notice(F("Connected, IP address: %s" CR), WiFi.localIP().toString().c_str());
+
+    MDNS.begin(WiFi.getHostname());
+
+    String myUrl = "http://%7EFoo:%7Ep@$$wOrd@brewpi.local:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
     LCBUrl url;
 
     if (!url.setUrl(myUrl)) {
-        Log.fatal(F("Failure in setUrl();" CR));
+        Log.fatal(F("Failure in setUrl();" CR CR));
     } else {
-        Log.notice(F("Return from setUrl():" CR));
+        Log.notice(F("Return from setUrl():" CR CR));
 
         Log.notice(F("\tgetUrl(); = %s" CR), url.getUrl().c_str());
         Log.notice(F("\tgetScheme(); = %s" CR), url.getScheme().c_str());
@@ -63,6 +85,10 @@ void setup() {
         Log.notice(F("\tgetAfterPath(); = %s" CR), url.getAfterPath().c_str());
         Log.notice(F("\tgetQuery(); = %s" CR), url.getQuery().c_str());
         Log.notice(F("\tgetFragment(); = %s" CR CR), url.getFragment().c_str());
+
+        Log.notice(F("\tHostname isMDNS(): %T" CR), url.isMDNS(url.getHost().c_str()));
+        Log.notice(F("\tHostname isValidHostName(): %T" CR), url.isValidHostName(url.getHost().c_str()));
+        Log.notice(F("\tHostname isValidIP(): %T" CR CR), url.isValidIP(url.getHost().c_str()));
     }
 
     Log.notice(F("LCBUrl test run complete." CR));
