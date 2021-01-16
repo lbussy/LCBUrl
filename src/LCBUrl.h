@@ -40,8 +40,11 @@
 #include <ESPmDNS.h>
 #endif
 
+#include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
+
+#include <ArduinoLog.h> // DEBUG
 
 // Library interface description
 class LCBUrl
@@ -51,7 +54,6 @@ public:
     LCBUrl(const String &newUrl = "");
     ~LCBUrl(){};
     bool setUrl(const String &newUrl);
-    bool isMDNS();
     String getUrl();
     String getIPUrl();
     String getScheme();
@@ -67,6 +69,15 @@ public:
     String getAfterPath();
     String getQuery();
     String getFragment();
+
+    // Utility functions
+    bool isMDNS() __attribute__ ((deprecated));
+    bool isMDNS(const char *hostName);
+    bool isValidIP(const char * hostName);
+    int labelCount(const char * hostName);
+    bool isANumber(const char * str);
+    bool isValidLabel(const char *label);
+    bool isValidHostName(const char *hostName);
 
     // Library-accessible "private" interface
 private:
