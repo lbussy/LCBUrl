@@ -220,57 +220,6 @@ String LCBUrl::getHost() // Return FQDN
     return host;
 }
 
-IPAddress LCBUrl::getIP() // Return IP address of FQDN (helpful for mDNS)
-{
-    IPAddress returnIP = INADDR_NONE;
-
-    // First try to resolve the address fresh
-    if (getHost().endsWith(".local"))
-    { // Host is an mDNS name
-        String hostname = getHost();
-        hostname.remove(hostname.lastIndexOf(".local"));
-
-#ifdef ESP8266
-        int result = WiFi.hostByName(hostname.c_str(), returnIP);
-
-        if (result == 1)
-        {
-            if (returnIP != INADDR_NONE)
-            {
-                ipaddress = returnIP;
-            }
-        }
-#else
-        struct ip4_addr addr;
-        addr.addr = 0;
-        esp_err_t err = mdns_query_a(hostname.c_str(), 2000, &addr);
-
-        if (err == ESP_OK)
-        {
-            char ipstring[16];
-            snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
-            returnIP.fromString(ipstring);
-            if (returnIP != INADDR_NONE)
-            {
-                ipaddress = returnIP;
-            }
-        }
-#endif
-    }
-    else
-    { // Host is not an mDNS name
-        if (WiFi.hostByName(getHost().c_str(), returnIP) == 1)
-        {
-            ipaddress = returnIP;
-        }
-    }
-    
-    // If we got a new IP address, we will use it.  Otherwise
-    // we will use last known good (if there is one), falls back
-    // to INADDR_NONE
-    return ipaddress;
-}
-
 unsigned int LCBUrl::getPort() // Port will be any integer between : and / in authority
 {
     if (port == 0)
@@ -351,7 +300,7 @@ String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (opti
         }
         if (ipaddress == INADDR_NONE)
         {
-            ipauthority.concat(getIP().toString());
+            ipauthority.concat(getIP(getHost().c_str()).toString());
         }
         else
         {
@@ -466,6 +415,12 @@ String LCBUrl::getRawAuthority() // Authority is similar to "lbussy@raspberrypi.
     return rawauthority;
 }
 
+String getDotSegmentsClear()
+{
+    // TODO:  https://tools.ietf.org/html/rfc3986#section-5.2.4
+    return "TODO";
+}
+
 String LCBUrl::getAfterAuth() // Get anything after the authority
 {
     if (afterauth.length() == 0)
@@ -578,6 +533,7 @@ String LCBUrl::getPathSegment() // Path will be between the / after host and ?
         }
         pathsegment = tempUrl;
     }
+    // TODO: Remove dot segments per 5.2.4
     return pathsegment;
 }
 
@@ -601,7 +557,6 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
     ipauthority = "";
     pathsegment = "";
     path = "";
-    removedotsegments = "";
     afterpath = "";
     query = "";
     fragment = "";
@@ -610,13 +565,12 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
 // Utility Methods //////////////////////////////////////////////////////////////
 // These do not directly influence or change the core library properties
 
-[[deprecated("Replaced by LCBUrl::isMDNS(const char *hostName);.")]]
-bool LCBUrl::isMDNS() // Determine if FQDN is mDNS
+bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
 {
-    return getHost().endsWith(".local");
+    return isMDNS(getHost().c_str());
 }
 
-bool LCBUrl::isMDNS(const char *hostName)
+bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 {
     // Check for a valid mDNS name
 
@@ -646,6 +600,63 @@ bool LCBUrl::isMDNS(const char *hostName)
 		return false;
 
     return true;
+}
+
+IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for mDNS)
+{
+    return getIP(getHost().c_str());
+}
+
+IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (helpful for mDNS)
+{
+    IPAddress returnIP = INADDR_NONE;
+
+    // First try to resolve the address fresh
+    if (isMDNS(hostName))
+    { // Host is an mDNS name
+        char hn[strlen(hostName) + 1];
+        strlcpy(hn, hostName, sizeof(hn));
+        hn[strlen(hn)-6] = 0;
+
+#ifdef ESP8266
+        int result = WiFi.hostByName(hostName, returnIP);
+
+        if (result == 1)
+        {
+            if (returnIP != INADDR_NONE)
+            {
+                ipaddress = returnIP;
+            }
+        }
+#else
+        struct ip4_addr addr;
+        addr.addr = 0;
+        esp_err_t err = mdns_query_a(hn, 2000, &addr);
+
+        if (err == ESP_OK)
+        {
+            char ipstring[16];
+            snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
+            returnIP.fromString(ipstring);
+            if (returnIP != INADDR_NONE)
+            {
+                ipaddress = returnIP;
+            }
+        }
+#endif
+    }
+    else
+    { // Host is not an mDNS name
+        if (WiFi.hostByName(hostName, returnIP) == 1)
+        {
+            ipaddress = returnIP;
+        }
+    }
+
+    // If we got a new IP address, we will use it.  Otherwise
+    // we will use last known good (if there is one), falls back
+    // to INADDR_NONE
+    return ipaddress;
 }
 
 bool LCBUrl::isValidIP(const char * hostName)

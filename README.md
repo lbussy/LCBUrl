@@ -43,7 +43,6 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - `String getUserName()` - Returns username (if present)
 - `String getPassword()` - Returns password (if present)
 - `String getHost()` - Return host name
-- `String getIP()` - Return IP address of host (always does lookup)
 - `word getPort()` - Return port (if present) if non-standard
 - `String getAuthority()` - Return the authority (if present) in the following format: `[userinfo@]host[:port]`
 - `String getIPAuthority()` - Return the authority (if present) in the following format: `[userinfo@]XXX.XXX.XXX.XXX[:port]` (useful for mDNS URLs, will use cached IPs if they exist)
@@ -56,6 +55,8 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 
 - `bool isMDNS()` - (deprecated)
 - `bool isMDNS(const char *hostName)` - Returns true if hostname is a valid mDNS name
+- `IPAddress getIP()` - (deprecated) Return IP address of class' host (always does lookup)
+- `IPAddress getIP()` - (deprecated) Return IP address of class' host (always does lookup)
 - `bool isValidIP(const char * hostName` - Returns true if hostName represents a valid IP address string
 - `int labelCount(const char * hostName)` - Integer of the number of labels in the hostname
 - `bool isANumber(const char * str)` - Returns true if string is a valid number

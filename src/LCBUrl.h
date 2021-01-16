@@ -61,7 +61,6 @@ public:
     String getUserName();
     String getPassword();
     String getHost();
-    IPAddress getIP();
     unsigned int getPort();
     String getAuthority();
     String getIPAuthority();
@@ -73,6 +72,8 @@ public:
     // Utility functions
     bool isMDNS() __attribute__ ((deprecated));
     bool isMDNS(const char *hostName);
+    IPAddress getIP() __attribute__ ((deprecated));
+    IPAddress getIP(const char * hostName);
     bool isValidIP(const char * hostName);
     int labelCount(const char * hostName);
     bool isANumber(const char * str);
@@ -83,10 +84,12 @@ public:
 private:
     String getRawUrl();
     String getCleanTriplets();
+    String getDotSegmentsClear();
     String getStripScheme();
     String getRawAuthority();
     String getAfterAuth();
     String getPathSegment();
+    void initRegisters();
     String rawurl;
     String url;
     String ipurl;
@@ -105,11 +108,9 @@ private:
     String ipauthority;
     String pathsegment;
     String path;
-    String removedotsegments;
     String afterpath;
     String query;
     String fragment;
-    void initRegisters();
 };
 
 #endif // _LCBURL_H
