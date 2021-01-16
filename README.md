@@ -28,14 +28,14 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = foo=bar
 - getFragment() = frag
-- isMDNS() = Boolean
 
 :exclamation: IMPORTANT: Using any of the IP-based methods in a timer will crash or hang your program. This hang is not a shortcoming of this library; it is how radio-functions (networking being one) work.
 
 ## Public Methods
 
+### Core Methods
+
 - `bool setUrl(String)` - Pass the URL to be handled to the class
-- `bool isMDNS(String)` - Return true/false based on whether URL is mDNS-based (*.local) or not
 - `String getUrl()` - Return a processed URI in the following format: `scheme:[//authority]path[?query][#fragment]`
 - `String getIPUrl()` - Return a processed URI with the host replaced by the IP address in the following format: `scheme:[//authority]path[?query][#fragment]` (useful for mDNS URLs)
 - `String getScheme()` - Get the scheme (currently only handles http and https)
@@ -52,6 +52,16 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - `String getQuery()` - Returns query (if present)
 - `String getFragment()` - Returns fragment (if present)
 
+### Utility Methods
+
+- `bool isMDNS()` - (deprecated)
+- `bool isMDNS(const char *hostName)` - Returns true if hostname is a valid mDNS name
+- `bool isValidIP(const char * hostName` - Returns true if hostName represents a valid IP address string
+- `int labelCount(const char * hostName)` - Integer of the number of labels in the hostname
+- `bool isANumber(const char * str)` - Returns true if string is a valid number
+- `bool isValidLabel(const char *label)` - Returns true if the string is a valid DNS label
+- `bool isValidHostName(const char *hostName)` - Return true if the hostname passed is a valid DNS, mDNS or IP hostname
+
 ## Progress:
 
 - [X] Convert percent-encoded triplets to uppercase
@@ -61,6 +71,7 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - [X] Convert an empty path to a "/" path
 - [X] Remove the default port
 - [X] ~~Add a trailing "/" to a non-empty path (may remove this)~~ (removed this after some thought)
+- [X] Add validity check functions (not yet part of the initialization)
 
 ## Installation
 

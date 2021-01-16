@@ -118,11 +118,6 @@ String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
     return ipurl;
 }
 
-bool LCBUrl::isMDNS() // Determine if FQDN is mDNS
-{
-    return getHost().endsWith(".local");
-}
-
 String LCBUrl::getScheme() // Returns URL scheme
 { // Currrently only finds http and https as scheme
     if (scheme.length() == 0)
@@ -610,4 +605,133 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
     afterpath = "";
     query = "";
     fragment = "";
+}
+
+// Utility Methods //////////////////////////////////////////////////////////////
+// These do not directly influence or change the core library properties
+
+[[deprecated("Replaced by LCBUrl::isMDNS(const char *hostName);.")]]
+bool LCBUrl::isMDNS() // Determine if FQDN is mDNS
+{
+    return getHost().endsWith(".local");
+}
+
+bool LCBUrl::isMDNS(const char *hostName)
+{
+    // Check for a valid mDNS name
+
+	// Split and check labels
+	char * label;
+	char * lastLabel = '\0';
+    int labelCount = 0;
+    char hn[strlen(hostName) + 1];
+    strlcpy(hn, hostName, strlen(hostName) + 1);
+	label = strtok(hn, ".");
+	while (label != NULL)
+	{
+        labelCount++;
+		lastLabel = label;
+		if (! isValidLabel(label))
+			return false;
+		label = strtok (NULL, ".");
+	}
+
+    // Cannot have more than two labels (plus "local")
+    // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
+    if (labelCount > 3)
+        return false;
+
+    // Must end in ".local"
+	if (strcmp(lastLabel, "local") != 0)
+		return false;
+
+    return true;
+}
+
+bool LCBUrl::isValidIP(const char * hostName)
+{
+    // Check if hostName is a valid IP address
+    return IPAddress().fromString(hostName);
+}
+
+int LCBUrl::labelCount(const char * hostName)
+{
+    // Return count of labels in a hostname
+	char * label;
+    int labelCount = 0;
+    char hn[strlen(hostName)];
+    strlcpy(hn, hostName, strlen(hostName));
+	label = strtok(hn, ".");
+	while (label != NULL)
+	{
+        labelCount++;
+		label = strtok (NULL, ".");
+	}
+    return labelCount;
+}
+
+bool LCBUrl::isANumber(const char * str)
+{
+    char* p;
+    strtol(str, &p, 10);
+    if (*p) {
+        return false;
+    }
+    return true;
+}
+
+bool LCBUrl::isValidLabel(const char *label)
+{
+    // Check that hostname label is valid
+
+	// Is at least 1 and no more than 63
+	if (strlen(label) < 1 || strlen(label) > 63)
+		return false;
+
+	// Does not begin or end with hyphen
+	if (label[0] == '-' || label[strlen(label) - 1] == '-')
+		return false;
+
+	// Does not contain all numbers
+	if (isANumber(label))
+		return false;
+
+	// Contains only letters, numbers and hyphen
+    for (int i = 0; i < strlen(label); i++)
+    {
+        if (! isalnum(label[i]) && label[i] != '-')
+            return false;
+    }
+    return true;
+}
+
+bool LCBUrl::isValidHostName(const char *hostName)
+{
+	// This will generally follow RFC1123 and RFC1034
+
+	// Check for min/max length (remember root label and octet count)
+	if (strlen(hostName) < 1 || strlen(hostName) > 253)
+		return false;
+
+	// Check if this is a valid IP address
+	if (isValidIP(hostName))
+		return true;
+
+	// Next check for mDNS
+	if (isMDNS(hostName))
+		return true;
+
+	// Next, check to see if each label is valid
+	char * label;
+    char hn[strlen(hostName)];
+    strlcpy(hn, hostName, strlen(hostName));
+	label = strtok(hn, ".");
+	while (label != NULL)
+	{
+		if (! isValidLabel(label))
+			return false;
+		label = strtok (NULL, ".");
+	}
+
+	return true;
 }
