@@ -298,7 +298,7 @@ String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (opti
         {
             ipauthority.concat(F("@"));
         }
-        if (ipaddress == INADDR_NONE)
+        if (ipaddress == (IPAddress)INADDR_NONE)
         {
             ipauthority.concat(getIP(getHost().c_str()).toString());
         }
