@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/github/license/lbussy/LCBUrl?style=plastic)](https://github.com/lbussy/LCBUrl/blob/master/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/lbussy/LCBUrl?style=plastic)](http://github.com/lbussy/LCBUrl/pulls)
-[![Contributors Welsome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](#Contributing)
+[![Contributors Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=plastic)](#Contributing)
 
 This library was written by and for a non-programmer.  If you find some use out of it, that will make me happy, but if not, I'm still using it in my projects.
 
@@ -28,14 +28,14 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - getAfterPath() = ?foo=bar#frag
 - getQuery() = foo=bar
 - getFragment() = frag
-- isMDNS
 
 :exclamation: IMPORTANT: Using any of the IP-based methods in a timer will crash or hang your program. This hang is not a shortcoming of this library; it is how radio-functions (networking being one) work.
 
 ## Public Methods
 
+### Core Methods
+
 - `bool setUrl(String)` - Pass the URL to be handled to the class
-- `bool isMDNS(String)` - Return true/false based on whether URL is mDNS-based (*.local) or not
 - `String getUrl()` - Return a processed URI in the following format: `scheme:[//authority]path[?query][#fragment]`
 - `String getIPUrl()` - Return a processed URI with the host replaced by the IP address in the following format: `scheme:[//authority]path[?query][#fragment]` (useful for mDNS URLs)
 - `String getScheme()` - Get the scheme (currently only handles http and https)
@@ -43,7 +43,6 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - `String getUserName()` - Returns username (if present)
 - `String getPassword()` - Returns password (if present)
 - `String getHost()` - Return host name
-- `String getIP()` - Return IP address of host (always does lookup)
 - `word getPort()` - Return port (if present) if non-standard
 - `String getAuthority()` - Return the authority (if present) in the following format: `[userinfo@]host[:port]`
 - `String getIPAuthority()` - Return the authority (if present) in the following format: `[userinfo@]XXX.XXX.XXX.XXX[:port]` (useful for mDNS URLs, will use cached IPs if they exist)
@@ -51,6 +50,18 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - `String getAfterPath()` - Returns query and fragment segments (if present)
 - `String getQuery()` - Returns query (if present)
 - `String getFragment()` - Returns fragment (if present)
+
+### Utility Methods
+
+- `bool isMDNS()` - (deprecated)
+- `bool isMDNS(const char *hostName)` - Returns true if hostname is a valid mDNS name
+- `IPAddress getIP()` - (deprecated) Return IP address of class' host (always does lookup)
+- `IPAddress getIP()` - (deprecated) Return IP address of class' host (always does lookup)
+- `bool isValidIP(const char * hostName` - Returns true if hostName represents a valid IP address string
+- `int labelCount(const char * hostName)` - Integer of the number of labels in the hostname
+- `bool isANumber(const char * str)` - Returns true if string is a valid number
+- `bool isValidLabel(const char *label)` - Returns true if the string is a valid DNS label
+- `bool isValidHostName(const char *hostName)` - Return true if the hostname passed is a valid DNS, mDNS or IP hostname
 
 ## Progress:
 
@@ -61,10 +72,11 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 - [X] Convert an empty path to a "/" path
 - [X] Remove the default port
 - [X] ~~Add a trailing "/" to a non-empty path (may remove this)~~ (removed this after some thought)
+- [X] Add validity check functions (not yet part of the initialization)
 
 ## Installation
 
-Instalation is particular to the platform with which you are developing:
+Installation is particular to the platform with which you are developing:
 
 ### PlatformIO
 
@@ -85,7 +97,7 @@ When installed, this library should contain the following files:
 ./lib/targets/libraries/LCBUrl                    (this library's folder)
 ./lib/targets/libraries/LCBUrl/examples           (the examples in the "open" menu)
 ./lib/targets/libraries/LCBUrl/keywords.txt       (the syntax coloring file)
-./lib/targets/libraries/LCBUrl/library.properties (properties of this libraary)
+./lib/targets/libraries/LCBUrl/library.properties (properties of this library)
 ./lib/targets/libraries/LCBUrl/LICENSE            (the license for this library)
 ./lib/targets/libraries/LCBUrl/README.md          (this file)
 ./lib/targets/libraries/LCBUrl/src/LCBUrl.cpp     (the library implementation file)

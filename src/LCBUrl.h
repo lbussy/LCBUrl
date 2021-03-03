@@ -40,18 +40,20 @@
 #include <ESPmDNS.h>
 #endif
 
+#include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
+
+#include <ArduinoLog.h> // DEBUG
 
 // Library interface description
 class LCBUrl
 {
     // User-accessible "public" interface
 public:
-    LCBUrl();
+    LCBUrl(const String &newUrl = "");
     ~LCBUrl(){};
-    bool setUrl(const String &);
-    bool isMDNS();
+    bool setUrl(const String &newUrl);
     String getUrl();
     String getIPUrl();
     String getScheme();
@@ -59,8 +61,7 @@ public:
     String getUserName();
     String getPassword();
     String getHost();
-    IPAddress getIP();
-    word getPort();
+    unsigned int getPort();
     String getAuthority();
     String getIPAuthority();
     String getPath();
@@ -68,14 +69,27 @@ public:
     String getQuery();
     String getFragment();
 
+    // Utility functions
+    bool isMDNS() __attribute__ ((deprecated));
+    bool isMDNS(const char *hostName);
+    IPAddress getIP() __attribute__ ((deprecated));
+    IPAddress getIP(const char * hostName);
+    bool isValidIP(const char * hostName);
+    int labelCount(const char * hostName);
+    bool isANumber(const char * str);
+    bool isValidLabel(const char *label);
+    bool isValidHostName(const char *hostName);
+
     // Library-accessible "private" interface
 private:
     String getRawUrl();
     String getCleanTriplets();
+    String getDotSegmentsClear();
     String getStripScheme();
     String getRawAuthority();
     String getAfterAuth();
     String getPathSegment();
+    void initRegisters();
     String rawurl;
     String url;
     String ipurl;
@@ -89,12 +103,11 @@ private:
     String password;
     String host;
     IPAddress ipaddress;
-    word port;
+    unsigned int port;
     String authority;
     String ipauthority;
     String pathsegment;
     String path;
-    String removedotsegments;
     String afterpath;
     String query;
     String fragment;
