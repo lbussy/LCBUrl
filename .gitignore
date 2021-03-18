@@ -4,6 +4,7 @@
 .piolibdeps
 .vscode
 *.code-workspace
+src/*.ino
 
 # Prerequisites
 *.d
