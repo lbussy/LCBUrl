@@ -6,7 +6,7 @@
 /*
     MIT License
 
-    Copyright (c) 2019-2020 Lee C. Bussy
+    Copyright (c) 2019-2021 Lee C. Bussy
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 */
 
 // Ensure this library description is only included once
+
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
@@ -43,8 +44,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
-
-#include <ArduinoLog.h> // DEBUG
 
 // Library interface description
 class LCBUrl
