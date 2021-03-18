@@ -28,6 +28,7 @@
 */
 
 // Ensure this library description is only included once
+
 #ifndef _LCBURL_H
 #define _LCBURL_H
 
@@ -43,8 +44,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
-
-#include <ArduinoLog.h> // DEBUG
 
 // Library interface description
 class LCBUrl
