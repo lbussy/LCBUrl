@@ -43,6 +43,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string.h>
 #include <Arduino.h>
 
 // Library interface description
@@ -72,12 +73,12 @@ public:
     bool isMDNS() __attribute__ ((deprecated));
     bool isMDNS(char *fqdn);
     IPAddress getIP() __attribute__ ((deprecated));
-    IPAddress getIP(const char * fqdn);
-    bool isValidIP(const char * fqdn);
-    int labelCount(const char * fqdn);
-    bool isANumber(const char * str);
-    bool isValidLabel(const char *label);
-    bool isValidHostName(const char *fqdn);
+    IPAddress getIP(char * fqdn);
+    bool isValidIP(char * fqdn);
+    int labelCount(char * fqdn);
+    bool isANumber(char * str);
+    bool isValidLabel(char *label);
+    bool isValidHostName(char *fqdn);
 
     // Library-accessible "private" interface
 private:
