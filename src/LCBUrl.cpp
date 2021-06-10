@@ -584,7 +584,7 @@ bool LCBUrl::isMDNS(char *fqdn) // Determine if FQDN is mDNS
 
 	// Split and check labels
 	char * label;
-	char * lastLabel = '\0';
+	char * lastLabel = (char *)'\0';
     int labelCount = 0;
 	label = strtok(fqdn, ".");
 	while (label != NULL)
@@ -712,7 +712,7 @@ bool LCBUrl::isValidLabel(char *label)
 		return false;
 
 	// Contains only letters, numbers and hyphen
-    for (int i = 0; i < strlen(label); i++)
+    for (int i = 0; i < (int)strlen(label); i++)
     {
         if (! isalnum(label[i]) && label[i] != '-')
             return false;
