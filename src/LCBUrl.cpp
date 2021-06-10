@@ -570,7 +570,7 @@ bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
     return isMDNS(getHost().c_str());
 }
 
-bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
+bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
 {
     // Check for a valid mDNS name
 
@@ -578,8 +578,8 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 	char * label;
 	char * lastLabel = '\0';
     int labelCount = 0;
-    char hn[strlen(hostName) + 1];
-    strlcpy(hn, hostName, strlen(hostName) + 1);
+    char hn[strlen(fqdn) + 1];
+    strlcpy(hn, fqdn, strlen(fqdn) + 1);
 	label = strtok(hn, ".");
 	while (label != NULL)
 	{
@@ -607,19 +607,19 @@ IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for
     return getIP(getHost().c_str());
 }
 
-IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (helpful for mDNS)
+IPAddress LCBUrl::getIP(const char * fqdn) // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = INADDR_NONE;
 
     // First try to resolve the address fresh
-    if (isMDNS(hostName))
+    if (isMDNS(fqdn))
     { // Host is an mDNS name
-        char hn[strlen(hostName) + 1];
-        strlcpy(hn, hostName, sizeof(hn));
+        char hn[strlen(fqdn) + 1];
+        strlcpy(hn, fqdn, sizeof(hn));
         hn[strlen(hn)-6] = 0;
 
 #ifdef ESP8266
-        int result = WiFi.hostByName(hostName, returnIP);
+        int result = WiFi.hostByName(fqdn, returnIP);
 
         if (result == 1)
         {
@@ -647,7 +647,7 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
     }
     else
     { // Host is not an mDNS name
-        if (WiFi.hostByName(hostName, returnIP) == 1)
+        if (WiFi.hostByName(fqdn, returnIP) == 1)
         {
             ipaddress = returnIP;
         }
@@ -659,19 +659,19 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
     return ipaddress;
 }
 
-bool LCBUrl::isValidIP(const char * hostName)
+bool LCBUrl::isValidIP(const char * fqdn)
 {
-    // Check if hostName is a valid IP address
-    return IPAddress().fromString(hostName);
+    // Check if fqdn is a valid IP address
+    return IPAddress().fromString(fqdn);
 }
 
-int LCBUrl::labelCount(const char * hostName)
+int LCBUrl::labelCount(const char * fqdn)
 {
     // Return count of labels in a hostname
 	char * label;
     int labelCount = 0;
-    char hn[strlen(hostName)];
-    strlcpy(hn, hostName, strlen(hostName));
+    char hn[strlen(fqdn)];
+    strlcpy(hn, fqdn, strlen(fqdn));
 	label = strtok(hn, ".");
 	while (label != NULL)
 	{
@@ -716,26 +716,26 @@ bool LCBUrl::isValidLabel(const char *label)
     return true;
 }
 
-bool LCBUrl::isValidHostName(const char *hostName)
+bool LCBUrl::isValidHostName(const char *fqdn)
 {
 	// This will generally follow RFC1123 and RFC1034
 
 	// Check for min/max length (remember root label and octet count)
-	if (strlen(hostName) < 1 || strlen(hostName) > 253)
+	if (strlen(fqdn) < 1 || strlen(fqdn) > 253)
 		return false;
 
 	// Check if this is a valid IP address
-	if (isValidIP(hostName))
+	if (isValidIP(fqdn))
 		return true;
 
 	// Next check for mDNS
-	if (isMDNS(hostName))
+	if (isMDNS(fqdn))
 		return true;
 
 	// Next, check to see if each label is valid
 	char * label;
-    char hn[strlen(hostName)];
-    strlcpy(hn, hostName, strlen(hostName));
+    char hn[strlen(fqdn)];
+    strlcpy(hn, fqdn, strlen(fqdn));
 	label = strtok(hn, ".");
 	while (label != NULL)
 	{

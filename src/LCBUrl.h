@@ -70,14 +70,14 @@ public:
 
     // Utility functions
     bool isMDNS() __attribute__ ((deprecated));
-    bool isMDNS(const char *hostName);
+    bool isMDNS(const char *fqdn);
     IPAddress getIP() __attribute__ ((deprecated));
-    IPAddress getIP(const char * hostName);
-    bool isValidIP(const char * hostName);
-    int labelCount(const char * hostName);
+    IPAddress getIP(const char * fqdn);
+    bool isValidIP(const char * fqdn);
+    int labelCount(const char * fqdn);
     bool isANumber(const char * str);
     bool isValidLabel(const char *label);
-    bool isValidHostName(const char *hostName);
+    bool isValidHostName(const char *fqdn);
 
     // Library-accessible "private" interface
 private:
