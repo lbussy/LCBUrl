@@ -570,7 +570,7 @@ bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
     return isMDNS(getHost().c_str());
 }
 
-bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
+bool LCBUrl::isMDNS(char *fqdn) // Determine if FQDN is mDNS
 {
     // Check for a valid mDNS name
 
@@ -578,9 +578,7 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
 	char * label;
 	char * lastLabel = '\0';
     int labelCount = 0;
-    char hn[strlen(fqdn) + 1];
-    strlcpy(hn, fqdn, strlen(fqdn) + 1);
-	label = strtok(hn, ".");
+	label = strtok(fqdn, ".");
 	while (label != NULL)
 	{
         labelCount++;

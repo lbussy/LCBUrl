@@ -70,7 +70,7 @@ public:
 
     // Utility functions
     bool isMDNS() __attribute__ ((deprecated));
-    bool isMDNS(const char *fqdn);
+    bool isMDNS(char *fqdn);
     IPAddress getIP() __attribute__ ((deprecated));
     IPAddress getIP(const char * fqdn);
     bool isValidIP(const char * fqdn);
