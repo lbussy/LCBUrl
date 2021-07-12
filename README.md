@@ -112,6 +112,17 @@ Ensure that you add a corresponding line to the top of your sketch:
 
 To stop using this library, delete that line from your sketch.
 
+## mDNS Support
+
+To enable mDNS support, define the macro before including the library:
+
+``` cpp
+#define LCBURL_MDNS
+#include <LCBUrl.h>
+```
+
+Without this definition, the mDNS functions will return failures.
+
 ## Contributing
 
 If you would like to contribute to this project:
