@@ -567,11 +567,16 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
 
 bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
 {
+#ifdef LCBURL_MDNS
     return isMDNS(getHost().c_str());
+#else
+    return false;
+#endif
 }
 
 bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 {
+#ifdef LCBURL_MDNS
     // Check for a valid mDNS name
 
 	// Split and check labels
@@ -600,6 +605,9 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 		return false;
 
     return true;
+#else
+    return false;
+#endif
 }
 
 IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for mDNS)
@@ -611,6 +619,7 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
 {
     IPAddress returnIP = INADDR_NONE;
 
+#ifdef LCBURL_MDNS
     // First try to resolve the address fresh
     if (isMDNS(hostName))
     { // Host is an mDNS name
@@ -657,6 +666,9 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
     // we will use last known good (if there is one), falls back
     // to INADDR_NONE
     return ipaddress;
+#else
+    return returnIP;
+#endif
 }
 
 bool LCBUrl::isValidIP(const char * hostName)
@@ -728,9 +740,11 @@ bool LCBUrl::isValidHostName(const char *hostName)
 	if (isValidIP(hostName))
 		return true;
 
+#ifdef LCBURL_MDNS
 	// Next check for mDNS
 	if (isMDNS(hostName))
 		return true;
+#endif
 
 	// Next, check to see if each label is valid
 	char * label;
