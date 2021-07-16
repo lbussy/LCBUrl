@@ -330,6 +330,17 @@ String LCBUrl::getPath() // Get all after host and port, before query and frag
     return path;
 }
 
+String LCBUrl::getRFCPath() // Get all after host and port, before file, query, or frag
+{
+    if (path.length() == 0)
+    {
+        Serial.println(F("***DEBUG: About to getRFCPathSegment()")); // DEBUG
+        path = getRFCPathSegment();
+        // TODO: Remove dot segments per 5.2.4
+    }
+    return path;
+}
+
 String LCBUrl::getQuery() // Get text after '?' and before '#'
 {
     if (query.length() == 0)
@@ -519,6 +530,43 @@ String LCBUrl::getPathSegment() // Path will be between the / after host and ?
         }
 
         int endloc = tempUrl.lastIndexOf(F("?"));
+        if (endloc != -1)
+        {
+            tempUrl = tempUrl.substring(0, endloc);
+        }
+        else
+        {
+            int endloc = tempUrl.lastIndexOf(F("#"));
+            if (endloc != -1)
+            {
+                tempUrl = tempUrl.substring(0, endloc - 1);
+            }
+        }
+        pathsegment = tempUrl;
+    }
+    // TODO: Remove dot segments per 5.2.4
+    return pathsegment;
+}
+
+String LCBUrl::getRFCPathSegment() // Path will be between the / after host and ?
+{
+    if (pathsegment.length() == 0)
+    {
+        String tempUrl = getStripScheme();
+
+        int startloc = tempUrl.indexOf(F("/"));
+        if (startloc > 0)
+        {
+            tempUrl = tempUrl.substring(startloc + 1);
+        }
+        else
+        {
+            tempUrl = "";
+        }
+
+        Serial.print(F("***DEBUG: tempUrl = ")); // DEBUG
+        Serial.println(tempUrl);
+        int endloc = tempUrl.lastIndexOf(F("/"));
         if (endloc != -1)
         {
             tempUrl = tempUrl.substring(0, endloc);

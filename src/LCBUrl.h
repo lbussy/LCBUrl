@@ -67,6 +67,7 @@ public:
     unsigned int getPort();
     String getAuthority();
     String getIPAuthority();
+    String getRFCPath();
     String getPath();
     String getAfterPath();
     String getQuery();
@@ -92,6 +93,7 @@ private:
     String getRawAuthority();
     String getAfterAuth();
     String getPathSegment();
+    String getRFCPathSegment();
     void initRegisters();
     String rawurl;
     String url;
