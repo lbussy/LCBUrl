@@ -28,7 +28,9 @@
     SOFTWARE.
 */
 
+#define LCBURL_MDNS
 #include <LCBUrl.h>
+
 #include <Arduino.h>
 
 #ifdef ESP8266
