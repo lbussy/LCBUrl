@@ -34,11 +34,15 @@
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESP8266mDNS.h>
+#endif
 #endif
 #ifdef ESP32
 #include <WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESPmDNS.h>
+#endif
 #endif
 
 #include <stdio.h>
