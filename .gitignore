@@ -5,6 +5,7 @@
 .vscode
 *.code-workspace
 src/*.ino
+src/secret.h
 
 # Prerequisites
 *.d
