@@ -76,8 +76,9 @@ public:
     bool isMDNS() __attribute__ ((deprecated));
     bool isMDNS(const char *hostName);
     IPAddress getIP() __attribute__ ((deprecated));
+    IPAddress getIP(String hostname);
     IPAddress getIP(const char * hostName);
-    bool isValidIP(const char * hostName);
+    bool isValidIP(const char * address);
     int labelCount(const char * hostName);
     bool isANumber(const char * str);
     bool isValidLabel(const char *label);
