@@ -98,22 +98,25 @@ String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
     if (ipurl.isEmpty())
     {
         ipurl = "";
-        ipurl.concat(getScheme()); // http or https
+        ipurl.concat(getScheme());
         ipurl.concat(F("://"));
-        ipurl.concat(getIPAuthority()); // Username, password, host and port
+        ipurl.concat(getIPAuthority());
         ipurl.concat(F("/"));
-        ipurl.concat(getPath()); // Path
-        if (getQuery() != "") // Add a query string
+        if (!getPath().isEmpty())
+        {
+            ipurl.concat(getPath());
+        }
+        if (!getQuery().isEmpty())
         {
             ipurl.concat(F("?"));
             ipurl.concat(getQuery());
         }
-        if (getFragment() != "") // Add a fragment
+        if (getFragment() != "")
         {
             ipurl.concat(F("#"));
             ipurl.concat(getFragment());
         }
-        if ((getScheme() == "") || (getHost() == "")) // No idea what I was thinking here
+        if ((getScheme() == "") || (getHost() == ""))
         {
             return ipurl;
         }
@@ -287,7 +290,6 @@ String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (opti
 {
     if (ipauthority.isEmpty())
     {
-        ipauthority = "";
         if (!getUserName().isEmpty())
         {
             ipauthority = getUserName();
@@ -301,6 +303,7 @@ String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (opti
         {
             ipauthority.concat(F("@"));
         }
+        ipaddress = getIP(getHost());
         if (ipaddress == (IPAddress)INADDR_NONE)
         {
             ipauthority.concat(getIP(getHost().c_str()).toString());
@@ -723,6 +726,11 @@ IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for
     return getIP(getHost().c_str());
 }
 
+IPAddress LCBUrl::getIP(String hostname) // Return IP address of FQDN (helpful for mDNS)
+{
+    return getIP(hostname.c_str());
+}
+
 IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = INADDR_NONE;
@@ -777,10 +785,15 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
     return ipaddress;
 }
 
-bool LCBUrl::isValidIP(const char * hostName)
+bool LCBUrl::isValidIP(const char * address)
 {
-    // Check if hostName is a valid IP address
-    return IPAddress().fromString(hostName);
+    // Check if address is a valid IP address
+    IPAddress tempAddress;
+    tempAddress.fromString(address);
+    if (tempAddress == (IPAddress)INADDR_NONE || tempAddress == (IPAddress)INADDR_LOOPBACK || tempAddress == (IPAddress)INADDR_ANY)
+        return false;
+    else
+        return true;
 }
 
 int LCBUrl::labelCount(const char * hostName)
