@@ -37,7 +37,7 @@
 LCBUrl::LCBUrl(const String &newUrl)
 {
     initRegisters();
-    if (newUrl.length() > 0)
+    if (!newUrl.isEmpty())
         setUrl(newUrl);
 }
 
@@ -47,14 +47,14 @@ LCBUrl::LCBUrl(const String &newUrl)
 bool LCBUrl::setUrl(const String &newUrl)
 {
     bool retVal = false;
-    if (newUrl.length() > 0)
+    if (!newUrl.isEmpty())
     {
         initRegisters();
         rawurl = newUrl;
     }
-    if (rawurl.length() != 0)
+    if (!rawurl.isEmpty())
     {
-        if (getUrl().length() != 0)
+        if (!getUrl().isEmpty())
         {
             retVal = true;
         }
@@ -64,15 +64,18 @@ bool LCBUrl::setUrl(const String &newUrl)
 
 String LCBUrl::getUrl() // Returned parsed/normalized URL
 {
-    if (url.length() == 0)
+    if (url.isEmpty())
     {
         url = "";
         url.concat(getScheme());
         url.concat(F("://"));
         url.concat(getAuthority());
         url.concat(F("/"));
-        url.concat(getPath());
-        if (getQuery() != "")
+        if (!getPath().isEmpty())
+        {
+            url.concat(getPath());
+        }
+        if (!getQuery().isEmpty())
         {
             url.concat(F("?"));
             url.concat(getQuery());
@@ -92,25 +95,28 @@ String LCBUrl::getUrl() // Returned parsed/normalized URL
 
 String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
 {
-    if (ipurl.length() == 0)
+    if (ipurl.isEmpty())
     {
         ipurl = "";
-        ipurl.concat(getScheme()); // http or https
+        ipurl.concat(getScheme());
         ipurl.concat(F("://"));
-        ipurl.concat(getIPAuthority()); // Username, password, host and port
+        ipurl.concat(getIPAuthority());
         ipurl.concat(F("/"));
-        ipurl.concat(getPath()); // Path
-        if (getQuery() != "") // Add a query string
+        if (!getPath().isEmpty())
+        {
+            ipurl.concat(getPath());
+        }
+        if (!getQuery().isEmpty())
         {
             ipurl.concat(F("?"));
             ipurl.concat(getQuery());
         }
-        if (getFragment() != "") // Add a fragment
+        if (getFragment() != "")
         {
             ipurl.concat(F("#"));
             ipurl.concat(getFragment());
         }
-        if ((getScheme() == "") || (getHost() == "")) // No idea what I was thinking here
+        if ((getScheme() == "") || (getHost() == ""))
         {
             return ipurl;
         }
@@ -120,7 +126,7 @@ String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
 
 String LCBUrl::getScheme() // Returns URL scheme
 { // Currrently only finds http and https as scheme
-    if (scheme.length() == 0)
+    if (scheme.isEmpty())
     {
         scheme = "";
         int loc = getCleanTriplets().indexOf(F(":"));
@@ -140,7 +146,7 @@ String LCBUrl::getScheme() // Returns URL scheme
 String LCBUrl::getUserInfo() // Return username:passsword
 {
     // UserInfo will be anything to the left of the last @ in authority
-    if (userinfo.length() == 0)
+    if (userinfo.isEmpty())
     {
         userinfo = "";
         String tempUrl = getRawAuthority();
@@ -159,7 +165,7 @@ String LCBUrl::getUserInfo() // Return username:passsword
 String LCBUrl::getUserName() // Return username from authority
 {
     // User Name will be anything to the left of : in userinfo
-    if (username.length() == 0)
+    if (username.isEmpty())
     {
         username = "";
         String tempUrl = getUserInfo();
@@ -178,7 +184,7 @@ String LCBUrl::getUserName() // Return username from authority
 String LCBUrl::getPassword() // Return password from authority
 {
     // Password will be anything to the right of : in userinfo
-    if (password.length() == 0)
+    if (password.isEmpty())
     {
         password = "";
         String tempUrl = getUserInfo();
@@ -197,7 +203,7 @@ String LCBUrl::getPassword() // Return password from authority
 String LCBUrl::getHost() // Return FQDN
 {
     // Host will be anything between @ and : or / in authority
-    if (host.length() == 0)
+    if (host.isEmpty())
     {
         host = "";
         String tempUrl = getRawAuthority();
@@ -225,7 +231,7 @@ unsigned int LCBUrl::getPort() // Port will be any integer between : and / in au
     if (port == 0)
     {
         String tempUrl = getRawAuthority();
-        if (tempUrl.length() > 0)
+        if (tempUrl.isEmpty())
         {
             int startloc = tempUrl.lastIndexOf(F(":"));
             int endloc = tempUrl.lastIndexOf(F("/"));
@@ -249,19 +255,19 @@ unsigned int LCBUrl::getPort() // Port will be any integer between : and / in au
 
 String LCBUrl::getAuthority() // Return username:password@fqdn:port
 {
-    if (authority.length() == 0)
+    if (authority.isEmpty())
     {
         authority = "";
-        if (getUserName().length() > 0)
+        if (!getUserName().isEmpty())
         {
             authority = getUserName();
         }
-        if (getPassword().length() > 0)
+        if (!getPassword().isEmpty())
         {
             authority.concat(F(":"));
             authority.concat(getPassword());
         }
-        if (authority.length() > 0)
+        if (!authority.isEmpty())
         {
             authority.concat(F("@"));
         }
@@ -282,22 +288,22 @@ String LCBUrl::getAuthority() // Return username:password@fqdn:port
 
 String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (optional)}@{fqdn}
 {
-    if (ipauthority.length() == 0)
+    if (ipauthority.isEmpty())
     {
-        ipauthority = "";
-        if (getUserName().length() > 0)
+        if (!getUserName().isEmpty())
         {
             ipauthority = getUserName();
         }
-        if (getPassword().length() > 0)
+        if (!getPassword().isEmpty())
         {
             ipauthority.concat(F(":"));
             ipauthority.concat(getPassword());
         }
-        if (ipauthority.length() > 0)
+        if (!ipauthority.isEmpty())
         {
             ipauthority.concat(F("@"));
         }
+        ipaddress = getIP(getHost());
         if (ipaddress == (IPAddress)INADDR_NONE)
         {
             ipauthority.concat(getIP(getHost().c_str()).toString());
@@ -322,17 +328,61 @@ String LCBUrl::getIPAuthority() // Returns {username (optional)}:{password (opti
 
 String LCBUrl::getPath() // Get all after host and port, before query and frag
 {
-    if (path.length() == 0)
+    if (path.isEmpty())
     {
+        if (!getPathSegmentNoFile().isEmpty())
+        {
+            path = getPathSegmentNoFile();
+            if (!getFileName().isEmpty())
+            {
+                path.concat(F("/"));
+                path.concat(getFileName());
+            }
+        }
         path = getPathSegment();
         // TODO: Remove dot segments per 5.2.4
     }
     return path;
 }
 
+String LCBUrl::getFileName()
+{
+    if (filename.isEmpty())
+    {
+        String tempUrl = getStripScheme();
+
+        int startloc = tempUrl.lastIndexOf(F("/"));
+        if (startloc > 0)
+        {
+            tempUrl = tempUrl.substring(startloc + 1);
+        }
+        else
+        {
+            tempUrl = "";
+        }
+
+        int endloc = tempUrl.lastIndexOf(F("?"));
+        if (endloc != -1)
+        {
+            tempUrl = tempUrl.substring(0, endloc);
+        }
+        else
+        {
+            int endloc = tempUrl.lastIndexOf(F("#"));
+            if (endloc != -1)
+            {
+                tempUrl = tempUrl.substring(0, endloc - 1);
+            }
+        }
+        if (tempUrl.indexOf(".") != -1)
+            filename = tempUrl;
+    }
+    return filename;
+}
+
 String LCBUrl::getQuery() // Get text after '?' and before '#'
 {
-    if (query.length() == 0)
+    if (query.isEmpty())
     {
         query = "";
         String tempUrl = getAfterPath();
@@ -347,7 +397,7 @@ String LCBUrl::getQuery() // Get text after '?' and before '#'
 
 String LCBUrl::getFragment() // Get all after '#'
 {
-    if (fragment.length() == 0)
+    if (fragment.isEmpty())
     {
         fragment = "";
         String tempUrl = getAfterPath();
@@ -365,7 +415,7 @@ String LCBUrl::getFragment() // Get all after '#'
 
 String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
 {
-    if (stripscheme.length() == 0)
+    if (stripscheme.isEmpty())
     {
         stripscheme = "";
         String tempUrl = getCleanTriplets();
@@ -395,11 +445,11 @@ String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
 
 String LCBUrl::getRawAuthority() // Authority is similar to "lbussy@raspberrypi.local:80"
 {
-    if (rawauthority.length() == 0)
+    if (rawauthority.isEmpty())
     {
         rawauthority = "";
         String tempUrl = getStripScheme();
-        if ((tempUrl) && (tempUrl.length() > 0))
+        if (tempUrl && !tempUrl.isEmpty())
         {
             int loc = tempUrl.indexOf(F("/"), 0);
             if (loc > 0)
@@ -415,7 +465,7 @@ String LCBUrl::getRawAuthority() // Authority is similar to "lbussy@raspberrypi.
     return rawauthority;
 }
 
-String getDotSegmentsClear()
+String LCBUrl::getDotSegmentsClear()
 {
     // TODO:  https://tools.ietf.org/html/rfc3986#section-5.2.4
     return "TODO";
@@ -423,7 +473,7 @@ String getDotSegmentsClear()
 
 String LCBUrl::getAfterAuth() // Get anything after the authority
 {
-    if (afterauth.length() == 0)
+    if (afterauth.isEmpty())
     {
         afterauth = "";
         String tempUrl = getStripScheme();
@@ -436,29 +486,6 @@ String LCBUrl::getAfterAuth() // Get anything after the authority
         }
     }
     return afterauth;
-}
-
-String LCBUrl::getAfterPath() // Get anything after the path
-{
-    if (afterpath.length() == 0)
-    {
-        afterpath = "";
-        String tempUrl = getCleanTriplets();
-        int queryloc = tempUrl.lastIndexOf(F("?"));
-        if (queryloc != -1)
-        {
-            afterpath = tempUrl.substring(queryloc);
-        }
-        else
-        {
-            int queryloc = tempUrl.lastIndexOf(F("#"));
-            if (queryloc != -1)
-            {
-                afterpath = tempUrl.substring(queryloc);
-            }
-        }
-    }
-    return afterpath;
 }
 
 String LCBUrl::getCleanTriplets() // Convert URL encoded triplets
@@ -504,7 +531,7 @@ String LCBUrl::getCleanTriplets() // Convert URL encoded triplets
 
 String LCBUrl::getPathSegment() // Path will be between the / after host and ?
 {
-    if (pathsegment.length() == 0)
+    if (pathsegment.isEmpty())
     {
         String tempUrl = getStripScheme();
 
@@ -537,6 +564,95 @@ String LCBUrl::getPathSegment() // Path will be between the / after host and ?
     return pathsegment;
 }
 
+String LCBUrl::getAfterPath() // Get anything after the path
+{
+    if (afterpath.isEmpty())
+    {
+        afterpath = "";
+        String tempUrl = getStripScheme();
+        int queryloc = tempUrl.lastIndexOf(F("?"));
+        if (queryloc != -1)
+        {
+            afterpath = tempUrl.substring(queryloc);
+        }
+        else
+        {
+            int queryloc = tempUrl.lastIndexOf(F("#"));
+            if (queryloc != -1)
+            {
+                afterpath = tempUrl.substring(queryloc);
+            }
+        }
+    }
+    return afterpath;
+}
+
+String LCBUrl::getAfterPathNoFile() // Get anything after the proper RFC-defined path
+{
+    if (afternofilepath.isEmpty())
+    {
+        afternofilepath = "";
+        String tempUrl = getStripScheme();
+        int queryloc = tempUrl.lastIndexOf(F("/"));
+        if (queryloc != -1)
+        {
+            afternofilepath = tempUrl.substring(queryloc + 1);
+        }
+        else
+        {
+            int queryloc = tempUrl.lastIndexOf(F("?"));
+            if (queryloc != -1)
+            {
+                afternofilepath = tempUrl.substring(queryloc);
+            }
+            else
+            {
+                int queryloc = tempUrl.lastIndexOf(F("#"));
+                if (queryloc != -1)
+                {
+                    afternofilepath = tempUrl.substring(queryloc);
+                }
+            }
+        }
+    }
+    return afternofilepath;
+}
+
+String LCBUrl::getPathSegmentNoFile() // Path will be between the / after host and ?
+{
+    if (nofilepathsegment.isEmpty())
+    {
+        String tempUrl = getStripScheme();
+
+        int startloc = tempUrl.indexOf(F("/"));
+        if (startloc > 0)
+        {
+            tempUrl = tempUrl.substring(startloc + 1);
+        }
+        else
+        {
+            tempUrl = "";
+        }
+
+        int endloc = tempUrl.lastIndexOf(F("/"));
+        if (endloc != -1)
+        {
+            tempUrl = tempUrl.substring(0, endloc + 1);
+        }
+        else
+        {
+            int endloc = tempUrl.lastIndexOf(F("#"));
+            if (endloc != -1)
+            {
+                tempUrl = tempUrl.substring(0, endloc - 1);
+            }
+        }
+        nofilepathsegment = tempUrl;
+    }
+    // TODO: Remove dot segments per 5.2.4
+    return nofilepathsegment;
+}
+
 void LCBUrl::initRegisters() // Clear out the internals to allow the object to be re-used
 {
     rawurl = "";
@@ -556,8 +672,11 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
     authority = "";
     ipauthority = "";
     pathsegment = "";
+    nofilepathsegment = "";
     path = "";
     afterpath = "";
+    afternofilepath = "";
+    filename = "";
     query = "";
     fragment = "";
 }
@@ -567,16 +686,11 @@ void LCBUrl::initRegisters() // Clear out the internals to allow the object to b
 
 bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
 {
-#ifdef LCBURL_MDNS
     return isMDNS(getHost().c_str());
-#else
-    return false;
-#endif
 }
 
 bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 {
-#ifdef LCBURL_MDNS
     // Check for a valid mDNS name
 
 	// Split and check labels
@@ -605,9 +719,6 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 		return false;
 
     return true;
-#else
-    return false;
-#endif
 }
 
 IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for mDNS)
@@ -615,14 +726,19 @@ IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for
     return getIP(getHost().c_str());
 }
 
+IPAddress LCBUrl::getIP(String hostname) // Return IP address of FQDN (helpful for mDNS)
+{
+    return getIP(hostname.c_str());
+}
+
 IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = INADDR_NONE;
 
-#ifdef LCBURL_MDNS
     // First try to resolve the address fresh
     if (isMDNS(hostName))
     { // Host is an mDNS name
+#ifdef LCBURL_MDNS
         char hn[strlen(hostName) + 1];
         strlcpy(hn, hostName, sizeof(hn));
         hn[strlen(hn)-6] = 0;
@@ -637,7 +753,7 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
                 ipaddress = returnIP;
             }
         }
-#else
+#else // ESP32
         struct ip4_addr addr;
         addr.addr = 0;
         esp_err_t err = mdns_query_a(hn, 2000, &addr);
@@ -652,7 +768,8 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
                 ipaddress = returnIP;
             }
         }
-#endif
+#endif // ESP8266
+#endif // LCBURL_MDNS
     }
     else
     { // Host is not an mDNS name
@@ -666,15 +783,17 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
     // we will use last known good (if there is one), falls back
     // to INADDR_NONE
     return ipaddress;
-#else
-    return returnIP;
-#endif
 }
 
-bool LCBUrl::isValidIP(const char * hostName)
+bool LCBUrl::isValidIP(const char * address)
 {
-    // Check if hostName is a valid IP address
-    return IPAddress().fromString(hostName);
+    // Check if address is a valid IP address
+    IPAddress tempAddress;
+    tempAddress.fromString(address);
+    if (tempAddress == (IPAddress)INADDR_NONE || tempAddress == (IPAddress)INADDR_LOOPBACK || tempAddress == (IPAddress)INADDR_ANY)
+        return false;
+    else
+        return true;
 }
 
 int LCBUrl::labelCount(const char * hostName)
