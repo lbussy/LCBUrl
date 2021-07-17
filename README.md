@@ -136,6 +136,12 @@ To enable mDNS support, define the macro before including the library:
 #include <LCBUrl.h>
 ```
 
+Or, define it globally in the platformio.ini or compiler definitions:
+
+``` ini
+-DLCBURL_MDNS
+```
+
 Without this definition, the mDNS functions will return failures.
 
 ## Contributing
