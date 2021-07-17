@@ -125,7 +125,7 @@ String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
 }
 
 String LCBUrl::getScheme() // Returns URL scheme
-{ // Currrently only finds http and https as scheme
+{                          // Currrently only finds http and https as scheme
     if (scheme.isEmpty())
     {
         scheme = "";
@@ -694,19 +694,19 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
 {
     // Check for a valid mDNS name
 
-	// Split and check labels
-	char * label;
-	char * lastLabel = (char*)'\0';
+    // Split and check labels
+    char *label;
+    char *lastLabel = (char *)'\0';
     int labelCount = 0;
-	label = strtok((char *)fqdn, ".");
-	while (label != NULL)
-	{
+    label = strtok((char *)fqdn, ".");
+    while (label != NULL)
+    {
         labelCount++;
-		lastLabel = label;
-		if (! isValidLabel(label))
-			return false;
-		label = strtok (NULL, ".");
-	}
+        lastLabel = label;
+        if (!isValidLabel(label))
+            return false;
+        label = strtok(NULL, ".");
+    }
 
     // Cannot have more than two labels (plus "local")
     // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
@@ -714,8 +714,8 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
         return false;
 
     // Must end in ".local"
-	if (strcmp(lastLabel, "local") != 0)
-		return false;
+    if (strcmp(lastLabel, "local") != 0)
+        return false;
 
     return true;
 }
@@ -730,7 +730,7 @@ IPAddress LCBUrl::getIP(String fqdn) // Return IP address of FQDN (helpful for m
     return getIP(fqdn.c_str());
 }
 
-IPAddress LCBUrl::getIP(const char * fqdn) // Return IP address of FQDN (helpful for mDNS)
+IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = IPADDR_NONE;
 
@@ -739,6 +739,22 @@ IPAddress LCBUrl::getIP(const char * fqdn) // Return IP address of FQDN (helpful
     { // Host is an mDNS name
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
+        // TODO:  This no longer works for ESP8266
+        esp_err_t result = mdns_query(fqdn);
+        if (n == 0)
+        {
+            Serial.println("No service found");
+        }
+        else
+        {
+            Serial.println("Service found");
+            Serial.println("Host: " + String(MDNS.hostname(0)));
+            Serial.print("IP  : ");
+            Serial.println(MDNS.IP(0));
+            Serial.println("Port: " + String(MDNS.port(0)));
+        }
+        return INADDR_NONE;
+
         int result = WiFi.hostByName(fqdn, returnIP);
 
         if (result == 1)
@@ -748,12 +764,12 @@ IPAddress LCBUrl::getIP(const char * fqdn) // Return IP address of FQDN (helpful
                 ipaddress = returnIP;
             }
         }
-#else // ESP32
+#else  // ESP32
         struct ip4_addr addr;
         addr.addr = 0;
         char dn[strlen(fqdn) + 1];
         strlcpy(dn, fqdn, sizeof(dn));
-        dn[strlen(dn)-6] = 0;
+        dn[strlen(dn) - 6] = 0;
         esp_err_t err = mdns_query_a(dn, 2000, &addr);
 
         if (err == ESP_OK)
@@ -783,7 +799,7 @@ IPAddress LCBUrl::getIP(const char * fqdn) // Return IP address of FQDN (helpful
     return ipaddress;
 }
 
-bool LCBUrl::isValidIP(const char * address)
+bool LCBUrl::isValidIP(const char *address)
 {
     // Check if address is a valid IP address
     IPAddress tempAddress;
@@ -794,25 +810,26 @@ bool LCBUrl::isValidIP(const char * address)
         return true;
 }
 
-int LCBUrl::labelCount(const char * fqdn)
+int LCBUrl::labelCount(const char *fqdn)
 {
     // Return count of labels in a fqdn
-	char * label;
+    char *label;
     int labelCount = 0;
-	label = strtok((char *)fqdn, ".");
-	while (label != NULL)
-	{
+    label = strtok((char *)fqdn, ".");
+    while (label != NULL)
+    {
         labelCount++;
-		label = strtok (NULL, ".");
-	}
+        label = strtok(NULL, ".");
+    }
     return labelCount;
 }
 
-bool LCBUrl::isANumber(const char * str)
+bool LCBUrl::isANumber(const char *str)
 {
-    char* p;
+    char *p;
     strtol(str, &p, 10);
-    if (*p) {
+    if (*p)
+    {
         return false;
     }
     return true;
@@ -822,22 +839,22 @@ bool LCBUrl::isValidLabel(const char *label)
 {
     // Check that hostname label is valid
 
-	// Is at least 1 and no more than 63
-	if (strlen(label) < 1 || strlen(label) > 63)
-		return false;
+    // Is at least 1 and no more than 63
+    if (strlen(label) < 1 || strlen(label) > 63)
+        return false;
 
-	// Does not begin or end with hyphen
-	if (label[0] == '-' || label[strlen(label) - 1] == '-')
-		return false;
+    // Does not begin or end with hyphen
+    if (label[0] == '-' || label[strlen(label) - 1] == '-')
+        return false;
 
-	// Does not contain all numbers
-	if (isANumber(label))
-		return false;
+    // Does not contain all numbers
+    if (isANumber(label))
+        return false;
 
-	// Contains only letters, numbers and hyphen
+    // Contains only letters, numbers and hyphen
     for (unsigned int i = 0; i < strlen(label); i++)
     {
-        if (! isalnum(label[i]) && label[i] != '-')
+        if (!isalnum(label[i]) && label[i] != '-')
             return false;
     }
     return true;
@@ -845,31 +862,31 @@ bool LCBUrl::isValidLabel(const char *label)
 
 bool LCBUrl::isValidHostName(const char *fqdn)
 {
-	// This will generally follow RFC1123 and RFC1034
+    // This will generally follow RFC1123 and RFC1034
 
-	// Check for min/max length (remember root label and octet count)
-	if (strlen(fqdn) < 1 || strlen(fqdn) > 253)
-		return false;
+    // Check for min/max length (remember root label and octet count)
+    if (strlen(fqdn) < 1 || strlen(fqdn) > 253)
+        return false;
 
-	// Check if this is a valid IP address
-	if (isValidIP(fqdn))
-		return true;
+    // Check if this is a valid IP address
+    if (isValidIP(fqdn))
+        return true;
 
 #ifdef LCBURL_MDNS
-	// Next check for mDNS
-	if (isMDNS(fqdn))
-		return true;
+    // Next check for mDNS
+    if (isMDNS(fqdn))
+        return true;
 #endif
 
-	// Next, check to see if each label is valid
-	char * label;
-	label = strtok((char *)fqdn, ".");
-	while (label != NULL)
-	{
-		if (! isValidLabel(label))
-			return false;
-		label = strtok (NULL, ".");
-	}
+    // Next, check to see if each label is valid
+    char *label;
+    label = strtok((char *)fqdn, ".");
+    while (label != NULL)
+    {
+        if (!isValidLabel(label))
+            return false;
+        label = strtok(NULL, ".");
+    }
 
-	return true;
+    return true;
 }
