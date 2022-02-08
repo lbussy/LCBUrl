@@ -576,7 +576,7 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 
 	// Split and check labels
 	char * label;
-	char * lastLabel = '\0';
+	char * lastLabel;
     int labelCount = 0;
     char hn[strlen(hostName) + 1];
     strlcpy(hn, hostName, strlen(hostName) + 1);
@@ -592,7 +592,7 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 
     // Cannot have more than two labels (plus "local")
     // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
-    if (labelCount > 3)
+    if (labelCount > 3 || labelCount == 0)
         return false;
 
     // Must end in ".local"
