@@ -629,7 +629,8 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
             }
         }
 #else
-        struct ip4_addr addr;
+        // struct ip4_addr addr;
+        esp_ip4_addr addr;
         addr.addr = 0;
         esp_err_t err = mdns_query_a(hn, 2000, &addr);
 
