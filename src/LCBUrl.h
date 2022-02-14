@@ -74,15 +74,15 @@ public:
 
     // Utility functions
     bool isMDNS() __attribute__ ((deprecated));
-    bool isMDNS(const char *hostName);
+    bool isMDNS(const char *fqdn);
     IPAddress getIP() __attribute__ ((deprecated));
-    IPAddress getIP(String hostname);
-    IPAddress getIP(const char * hostName);
+    IPAddress getIP(String fqdn);
+    IPAddress getIP(const char * fqdn);
     bool isValidIP(const char * address);
-    int labelCount(const char * hostName);
+    int labelCount(const char * fqdn);
     bool isANumber(const char * str);
     bool isValidLabel(const char *label);
-    bool isValidHostName(const char *hostName);
+    bool isValidHostName(const char *fqdn);
 
     // Library-accessible "private" interface
 private:

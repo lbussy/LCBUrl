@@ -144,6 +144,10 @@ Or, define it globally in the platformio.ini or compiler definitions:
 
 Without this definition, the mDNS functions will return failures.
 
+### mDNS on ESP8266
+
+After initial release of this library, the upstream `WiFi.hostByName()` stopped resolving mDNS queries.  I am exploring other options to provide name resolution for mDNS on the ESP8266.
+
 ## Contributing
 
 If you would like to contribute to this project:
