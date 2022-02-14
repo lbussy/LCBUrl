@@ -740,6 +740,9 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
         // TODO:  This no longer works for ESP8266
+        // TODO: See:
+        //          https://github.com/espressif/arduino-esp32/issues/3822
+        //          https://github.com/espressif/esp-idf/issues/6590
         esp_err_t result = mdns_query(fqdn);
         if (n == 0)
         {
@@ -794,7 +797,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
                 ipaddress = returnIP;
             }
         }
-#endif // ESP8266
+#endif // ESP32
 #endif // LCBURL_MDNS
     }
     else
