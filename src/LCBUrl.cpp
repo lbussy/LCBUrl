@@ -695,7 +695,7 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 
 	// Split and check labels
 	char * label;
-	char * lastLabel = '\0';
+	char * lastLabel;
     int labelCount = 0;
     char hn[strlen(hostName) + 1];
     strlcpy(hn, hostName, strlen(hostName) + 1);
@@ -711,7 +711,7 @@ bool LCBUrl::isMDNS(const char *hostName) // Determine if FQDN is mDNS
 
     // Cannot have more than two labels (plus "local")
     // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
-    if (labelCount > 3)
+    if (labelCount > 3 || labelCount == 0)
         return false;
 
     // Must end in ".local"
@@ -754,7 +754,19 @@ IPAddress LCBUrl::getIP(const char * hostName) // Return IP address of FQDN (hel
             }
         }
 #else // ESP32
+
+#if defined(ESP_ARDUINO_VERSION) && defined(ESP_ARDUINO_VERSION_VAL)
+    #define WM_ARDUINOVERCHECK ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2, 0, 0)
+#endif
+
+#if WM_ARDUINOVERCHECK
+        // Arduino Core 2.x
+        esp_ip4_addr addr;
+#else
+        // Arduino Core 1.x
         struct ip4_addr addr;
+#endif
+
         addr.addr = 0;
         esp_err_t err = mdns_query_a(hn, 2000, &addr);
 
