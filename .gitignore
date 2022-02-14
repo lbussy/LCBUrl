@@ -6,6 +6,7 @@
 *.code-workspace
 src/*.ino
 src/secret.h
+src/main.*
 
 # Prerequisites
 *.d
