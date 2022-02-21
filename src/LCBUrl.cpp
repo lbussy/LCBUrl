@@ -414,6 +414,18 @@ String LCBUrl::getFragment() // Get all after '#'
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
 
+bool LCBUrl::hasEnding(std::string const &fullString, std::string const &ending)
+{
+    if (fullString.length() >= ending.length())
+    {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    }
+    else
+    {
+        return false;
+    }
+}
+
 String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
 {
     if (stripscheme.isEmpty())
@@ -693,31 +705,24 @@ bool LCBUrl::isMDNS() // (deprecated) Determine if FQDN is mDNS
 bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
 {
     // Check for a valid mDNS name
-
-    // Split and check labels
-    char *label;
-    char *lastLabel = (char *)'\0';
-    int labelCount = 0;
-    label = strtok((char *)fqdn, ".");
-    while (label != NULL)
-    {
-        labelCount++;
-        lastLabel = label;
-        if (!isValidLabel(label))
-            return false;
-        label = strtok(NULL, ".");
-    }
-
-    // Cannot have more than two labels (plus "local")
-    // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
-    if (labelCount > 3 || labelCount == 0)
+    int lCount = labelCount(fqdn);
+    if (lCount == 0 || lCount > 3)
+        // Cannot have more than two labels (plus "local")
+        // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
         return false;
 
-    // Must end in ".local"
-    if (strcmp(lastLabel, "local") != 0)
+#ifdef ESP32
+    // // ESP32 must not use ".local" apparently
+    if (hasEnding(fqdn, ".local") || lCount > 1)
         return false;
-
-    return true;
+    else
+        return true;
+#else // Everything else has to have a .local
+    if (!hasEnding(fqdn, ".local"))
+        return false;
+    else
+        return true;
+#endif
 }
 
 IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for mDNS)
@@ -739,45 +744,26 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
     { // Host is an mDNS name
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
-        // TODO:  This no longer works for ESP8266
-        // TODO: See:
-        //          https://github.com/espressif/arduino-esp32/issues/3822
-        //          https://github.com/espressif/esp-idf/issues/6590
-        esp_err_t result = mdns_query(fqdn);
-        if (n == 0)
-        {
-            Serial.println("No service found");
-        }
-        else
-        {
-            Serial.println("Service found");
-            Serial.println("Host: " + String(MDNS.hostname(0)));
-            Serial.print("IP  : ");
-            Serial.println(MDNS.IP(0));
-            Serial.println("Port: " + String(MDNS.port(0)));
-        }
-        return INADDR_NONE;
-
         int result = WiFi.hostByName(fqdn, returnIP);
 
         if (result == 1)
         {
             if (returnIP != IPADDR_NONE)
-            {
                 ipaddress = returnIP;
-            }
         }
+        else
+            return ipaddress;
 #else // ESP32
 
 #if defined(ESP_ARDUINO_VERSION) && defined(ESP_ARDUINO_VERSION_VAL)
-    #define WM_ARDUINOVERCHECK ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2, 0, 0)
+#define WM_ARDUINOVERCHECK ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2, 0, 0)
 #endif
 
 #if WM_ARDUINOVERCHECK
-        // Arduino Core 2.x
+      // Arduino Core 2.x
         esp_ip4_addr addr;
 #else
-        // Arduino Core 1.x
+      // Arduino Core 1.x
         struct ip4_addr addr;
 #endif
 
@@ -793,9 +779,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
             snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
             returnIP.fromString(ipstring);
             if (returnIP != IPADDR_NONE)
-            {
                 ipaddress = returnIP;
-            }
         }
 #endif // ESP32
 #endif // LCBURL_MDNS
@@ -803,9 +787,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
     else
     { // Host is not an mDNS name
         if (WiFi.hostByName(fqdn, returnIP) == 1)
-        {
             ipaddress = returnIP;
-        }
     }
 
     // If we got a new IP address, we will use it.  Otherwise
@@ -830,7 +812,8 @@ int LCBUrl::labelCount(const char *fqdn)
     // Return count of labels in a fqdn
     char *label;
     int labelCount = 0;
-    label = strtok((char *)fqdn, ".");
+    std::string tempFqdn = std::string(fqdn);
+    label = strtok((char *)tempFqdn.c_str(), ".");
     while (label != NULL)
     {
         labelCount++;
