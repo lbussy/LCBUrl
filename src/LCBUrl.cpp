@@ -712,7 +712,11 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
         return false;
 
 #ifdef ESP32
-    // // ESP32 must not use ".local" apparently
+    // ESP32 must not use ".local" apparently:
+    //      https://github.com/espressif/esp-idf/issues/6590
+    //      https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
+    
+    // TODO:  Think about removing the .local for name resolution only
     if (hasEnding(fqdn, ".local") || lCount > 1)
         return false;
     else
