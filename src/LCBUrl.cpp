@@ -231,7 +231,7 @@ unsigned int LCBUrl::getPort() // Port will be any integer between : and / in au
     if (port == 0)
     {
         String tempUrl = getRawAuthority();
-        if (tempUrl.isEmpty())
+        if (!tempUrl.isEmpty())
         {
             int startloc = tempUrl.lastIndexOf(F(":"));
             int endloc = tempUrl.lastIndexOf(F("/"));
@@ -744,7 +744,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
     { // Host is an mDNS name
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
-        int result = WiFi.hostByName(fqdn, returnIP);
+        int result = WiFi.hostByName(fqdn, returnIP); // TODO: This is broken
 
         if (result == 1)
         {
