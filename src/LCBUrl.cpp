@@ -712,7 +712,11 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
         return false;
 
 #ifdef ESP32
-    // // ESP32 must not use ".local" apparently
+    // ESP32 must not use ".local" apparently:
+    //      https://github.com/espressif/esp-idf/issues/6590
+    //      https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
+
+    // TODO:  Think about removing the .local for name resolution only
     if (hasEnding(fqdn, ".local") || lCount > 1)
         return false;
     else
@@ -754,6 +758,8 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
         else
             return ipaddress;
 #else // ESP32
+    // May be able to use mDNS here for ESP32
+    //      https://www.tutorialfor.com/questions-324359.htm
 
 #if defined(ESP_ARDUINO_VERSION) && defined(ESP_ARDUINO_VERSION_VAL)
 #define WM_ARDUINOVERCHECK ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2, 0, 0)
