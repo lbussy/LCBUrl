@@ -744,7 +744,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
     { // Host is an mDNS name
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
-        int result = WiFi.hostByName(fqdn, returnIP); // TODO: This is broken
+        int result = WiFi.hostByName(fqdn, &returnIP); // TODO: This is broken
 
         if (result == 1)
         {
@@ -760,14 +760,14 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
 #endif
 
 #if WM_ARDUINOVERCHECK
-      // Arduino Core 2.x
+        // Arduino Core 2.x
         esp_ip4_addr addr;
 #else
-      // Arduino Core 1.x
+        // Arduino Core 1.x
         struct ip4_addr addr;
 #endif
 
-        addr.addr = 0;
+        addr.addr = ((u32_t)0xffffffffUL);
         char dn[strlen(fqdn) + 1];
         strlcpy(dn, fqdn, sizeof(dn));
         dn[strlen(dn) - 6] = 0;
@@ -775,11 +775,7 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
 
         if (err == ESP_OK)
         {
-            char ipstring[16];
-            snprintf(ipstring, sizeof(ipstring), IPSTR, IP2STR(&addr));
-            returnIP.fromString(ipstring);
-            if (returnIP != IPADDR_NONE)
-                ipaddress = returnIP;
+            ipaddress = returnIP;
         }
 #endif // ESP32
 #endif // LCBURL_MDNS
