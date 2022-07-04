@@ -34,16 +34,21 @@
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESP8266mDNS.h>
+#endif
 #endif
 #ifdef ESP32
 #include <WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESPmDNS.h>
+#endif
 #endif
 
 #include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
+#include <iostream>
 
 // Library interface description
 class LCBUrl
@@ -64,23 +69,25 @@ public:
     String getAuthority();
     String getIPAuthority();
     String getPath();
-    String getAfterPath();
+    String getFileName();
     String getQuery();
     String getFragment();
 
     // Utility functions
-    bool isMDNS() __attribute__ ((deprecated));
-    bool isMDNS(const char *hostName);
-    IPAddress getIP() __attribute__ ((deprecated));
-    IPAddress getIP(const char * hostName);
-    bool isValidIP(const char * hostName);
-    int labelCount(const char * hostName);
-    bool isANumber(const char * str);
+    bool isMDNS() __attribute__((deprecated));
+    bool isMDNS(const char *fqdn);
+    IPAddress getIP() __attribute__((deprecated));
+    IPAddress getIP(String fqdn);
+    IPAddress getIP(const char *fqdn);
+    bool isValidIP(const char *address);
+    int labelCount(const char *fqdn);
+    bool isANumber(const char *str);
     bool isValidLabel(const char *label);
-    bool isValidHostName(const char *hostName);
+    bool isValidHostName(const char *fqdn);
 
     // Library-accessible "private" interface
 private:
+    bool hasEnding(std::string const &fullString, std::string const &ending);
     String getRawUrl();
     String getCleanTriplets();
     String getDotSegmentsClear();
@@ -88,28 +95,34 @@ private:
     String getRawAuthority();
     String getAfterAuth();
     String getPathSegment();
+    String getPathSegmentNoFile();
+    String getAfterPath();
+    String getAfterPathNoFile();
     void initRegisters();
-    String rawurl;
-    String url;
-    String ipurl;
-    String workingurl;
-    String scheme;
-    String stripscheme;
-    String rawauthority;
-    String afterauth;
-    String userinfo;
-    String username;
-    String password;
-    String host;
-    IPAddress ipaddress;
-    unsigned int port;
-    String authority;
-    String ipauthority;
-    String pathsegment;
-    String path;
-    String afterpath;
-    String query;
-    String fragment;
+    String rawurl = "";
+    String url = "";
+    String ipurl = "";
+    String workingurl = "";
+    String scheme = "";
+    String stripscheme = "";
+    String rawauthority = "";
+    String afterauth = "";
+    String userinfo = "";
+    String username = "";
+    String password = "";
+    String host = "";
+    IPAddress ipaddress = INADDR_NONE;
+    unsigned int port = 0;
+    String authority = "";
+    String ipauthority = "";
+    String pathsegment = "";
+    String nofilepathsegment = "";
+    String path = "";
+    String afterpath = "";
+    String afternofilepath = "";
+    String filename = "";
+    String query = "";
+    String fragment = "";
 };
 
 #endif // _LCBURL_H

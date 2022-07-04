@@ -30,72 +30,141 @@
 
 #include <LCBUrl.h>
 #include <Arduino.h>
+#include <list>
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESP8266mDNS.h>
+#endif
 #endif
 #ifdef ESP32
 #include <WiFi.h>
+#ifdef LCBURL_MDNS
 #include <ESPmDNS.h>
 #endif
+#endif
 
-// LCBUrl does not require ArduinoLog.  It is used to
-// facilitate the examples.
-#include <ArduinoLog.h>
-#define LOG_LEVEL LOG_LEVEL_VERBOSE
+#if __has_include("./secret.h")
+#include "secret.h" // Include for AP_NAME and PASSWD below
+const char *ssid = AP_NAME;
+const char *password = PASSWRD;
+#else
+const char *ssid = "my_ap";
+const char *password = "passsword";
+#endif
 
-const char* ssid = "ssid";
-const char* password = "password";
+LCBUrl url;
 
-void setup() {
+std::list<String> lTestCases;
+
+void initTestCases()
+{
+    // URL(s) to test
+    String testCase;
+    testCase = "http://%7EFoo:%7Ep@$$wOrd@google.com/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
+    lTestCases.push_front(testCase);
+    testCase = "http://%7EFoo:%7Ep@$$wOrd@foo:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
+    lTestCases.push_front(testCase);
+    testCase = "http://%7EFoo:%7Ep@$$wOrd@foo.local:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
+    lTestCases.push_front(testCase);
+}
+
+// Called last from the variadic template function
+void printLine()
+{
+    Serial.println();
+}
+
+template <typename T, typename... Types>
+void printLine(T first, Types... other)
+{
+    Serial.print(first);
+    printLine(other...);
+}
+
+// Called last from the variadic template function
+void print()
+{
+    Serial.print("");
+}
+
+template <typename T, typename... Types>
+void print(T first, Types... other)
+{
+    Serial.print(first);
+    print(other...);
+}
+
+void printTest()
+{
+    initTestCases();
+    printLine("Running test.");
+    for (String &thisCase : lTestCases)
+    {
+        if (!url.setUrl(thisCase))
+        {
+            printLine("Failure in setUrl();\n");
+        }
+        else
+        {
+            printLine("\n\nSuccess in setUrl(", thisCase, "):");
+
+            printLine("\nNormal member functions:");
+            printLine("\tgetUrl(); = ", url.getUrl());
+            printLine("\tgetIPUrl(); = ", url.getIPUrl());
+            printLine("\tgetScheme(); = ", url.getScheme());
+            printLine("\tgetUserInfo(); = ", url.getUserInfo());
+            printLine("\tgetUserName(); = ", url.getUserName());
+            printLine("\tgetPassword(); = ", url.getPassword());
+            printLine("\tgetHost(); = ", url.getHost());
+            printLine("\tgetPort(); = ", url.getPort());
+            printLine("\tgetAuthority(); = ", url.getAuthority());
+            printLine("\tgetPath(); = ", url.getPath());
+            printLine("\tgetFileName(); = ", url.getFileName());
+            printLine("\tgetQuery(); = ", url.getQuery());
+            printLine("\tgetFragment(); = ", url.getFragment());
+
+            printLine("\nHelper functions:");
+            printLine("\tHostname isMDNS(): ", url.isMDNS(url.getHost().c_str()) ? "True" : "False");
+            printLine("\tgetIP(); = ", url.getIP(url.getHost()).toString().c_str());
+            printLine("\tHostname isValidHostName(): ", url.isValidHostName(url.getHost().c_str()) ? "True" : "False");
+            printLine("\tHostname isValidIP(): ", url.isValidIP(url.getIP(url.getHost()).toString().c_str()) ? "True" : "False");
+        }
+    }
+}
+
+void setup()
+{
     Serial.begin(BAUD);
     Serial.println();
     Serial.flush();
-    Log.begin(LOG_LEVEL, &Serial, false);
-    Log.notice(F("Starting test run of LCBUrl." CR CR));
+    Serial.println("Starting test run of LCBUrl.");
 
+    WiFi.disconnect();
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
+    print("Establishing connection to WiFi..");
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(1000);
-        Log.notice(F("Establishing connection to WiFi." CR));
+        print(F("."));
     }
-    Log.notice(F("Connected, IP address: %s" CR), WiFi.localIP().toString().c_str());
+    printLine();
+    printLine("Connected, IP address: ", WiFi.localIP().toString());
 
+#ifdef LCBURL_MDNS
     MDNS.begin(WiFi.getHostname());
+#endif
 
-    String myUrl = "http://%7EFoo:%7Ep@$$wOrd@brewpi.local:8000/%7EthIs/is/A/./Path/test.php?foo=bar#frag";
-    LCBUrl url;
+    printTest();
 
-    if (!url.setUrl(myUrl)) {
-        Log.fatal(F("Failure in setUrl();" CR CR));
-    } else {
-        Log.notice(F("Return from setUrl():" CR CR));
-
-        Log.notice(F("\tgetUrl(); = %s" CR), url.getUrl().c_str());
-        Log.notice(F("\tgetScheme(); = %s" CR), url.getScheme().c_str());
-        Log.notice(F("\tgetUserInfo(); = %s" CR), url.getUserInfo().c_str());
-        Log.notice(F("\tgetUserName(); = %s" CR), url.getUserName().c_str());
-        Log.notice(F("\tgetPassword(); = %s" CR), url.getPassword().c_str());
-        Log.notice(F("\tgetHost(); = %s" CR), url.getHost().c_str());
-        Log.notice(F("\tgetPort(); = %l" CR), url.getPort());
-        Log.notice(F("\tgetAuthority(); = %s" CR), url.getAuthority().c_str());
-        Log.notice(F("\tgetPath(); = %s" CR), url.getPath().c_str());
-        Log.notice(F("\tgetAfterPath(); = %s" CR), url.getAfterPath().c_str());
-        Log.notice(F("\tgetQuery(); = %s" CR), url.getQuery().c_str());
-        Log.notice(F("\tgetFragment(); = %s" CR CR), url.getFragment().c_str());
-
-        Log.notice(F("\tHostname isMDNS(): %T" CR), url.isMDNS(url.getHost().c_str()));
-        Log.notice(F("\tHostname isValidHostName(): %T" CR), url.isValidHostName(url.getHost().c_str()));
-        Log.notice(F("\tHostname isValidIP(): %T" CR CR), url.isValidIP(url.getHost().c_str()));
-    }
-
-    Log.notice(F("LCBUrl test run complete." CR));
+    printLine("\nLCBUrl test run complete.");
 }
 
-void loop() {
+void loop()
+{
 #ifdef ESP8266
-        yield();
+    yield();
 #endif
 }
