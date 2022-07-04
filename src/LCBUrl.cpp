@@ -416,10 +416,7 @@ String LCBUrl::getFragment() // Get all after '#'
 
 bool LCBUrl::hasEnding(std::string const &fullString, std::string const &ending)
 {
-    if (fullString.length() >= ending.length() + 2)                                                                                                                               // DEBUG
-        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-    else
-        return false;
+    return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
 }
 
 String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
@@ -726,7 +723,6 @@ IPAddress LCBUrl::getIP(String fqdn) // Return IP address of FQDN (helpful for m
 IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful for mDNS)
 {
     IPAddress returnIP = IPADDR_NONE;
-
     // First try to resolve the address fresh
     if (isMDNS(fqdn))
     { // Host is an mDNS name
@@ -757,16 +753,9 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
         struct ip4_addr addr;
 #endif
 
-        addr.addr = ((u32_t)0xffffffffUL);
-        char dn[strlen(fqdn) + 1];
-        strlcpy(dn, fqdn, sizeof(dn));
-        dn[strlen(dn) - 6] = 0;
-        esp_err_t err = mdns_query_a(dn, 2000, &addr);
+        mdns_init();
+        ipaddress = MDNS.queryHost("brewpi", 5000 /* ms */);
 
-        if (err == ESP_OK)
-        {
-            ipaddress = returnIP;
-        }
 #endif // ESP32
 #endif // LCBURL_MDNS
     }
