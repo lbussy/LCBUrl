@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <Arduino.h>
+#include <iostream>
 
 // Library interface description
 class LCBUrl
@@ -73,19 +74,20 @@ public:
     String getFragment();
 
     // Utility functions
-    bool isMDNS() __attribute__ ((deprecated));
+    bool isMDNS() __attribute__((deprecated));
     bool isMDNS(const char *fqdn);
-    IPAddress getIP() __attribute__ ((deprecated));
+    IPAddress getIP() __attribute__((deprecated));
     IPAddress getIP(String fqdn);
-    IPAddress getIP(const char * fqdn);
-    bool isValidIP(const char * address);
-    int labelCount(const char * fqdn);
-    bool isANumber(const char * str);
+    IPAddress getIP(const char *fqdn);
+    bool isValidIP(const char *address);
+    int labelCount(const char *fqdn);
+    bool isANumber(const char *str);
     bool isValidLabel(const char *label);
     bool isValidHostName(const char *fqdn);
 
     // Library-accessible "private" interface
 private:
+    bool hasEnding(std::string const &fullString, std::string const &ending);
     String getRawUrl();
     String getCleanTriplets();
     String getDotSegmentsClear();
