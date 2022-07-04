@@ -416,14 +416,10 @@ String LCBUrl::getFragment() // Get all after '#'
 
 bool LCBUrl::hasEnding(std::string const &fullString, std::string const &ending)
 {
-    if (fullString.length() >= ending.length())
-    {
+    if (fullString.length() >= ending.length() + 2)                                                                                                                               // DEBUG
         return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-    }
     else
-    {
         return false;
-    }
 }
 
 String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
@@ -711,22 +707,10 @@ bool LCBUrl::isMDNS(const char *fqdn) // Determine if FQDN is mDNS
         // https://github.com/lathiat/nss-mdns/blob/master/README.md#etcmdnsallow
         return false;
 
-#ifdef ESP32
-    // ESP32 must not use ".local" apparently:
-    //      https://github.com/espressif/esp-idf/issues/6590
-    //      https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
-
-    // TODO:  Think about removing the .local for name resolution only
-    if (hasEnding(fqdn, ".local") || lCount > 1)
-        return false;
-    else
-        return true;
-#else // Everything else has to have a .local
     if (!hasEnding(fqdn, ".local"))
         return false;
     else
         return true;
-#endif
 }
 
 IPAddress LCBUrl::getIP() // (deprecated) Return IP address of FQDN (helpful for mDNS)
@@ -758,18 +742,18 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
         else
             return ipaddress;
 #else // ESP32
-    // May be able to use mDNS here for ESP32
-    //      https://www.tutorialfor.com/questions-324359.htm
+      // May be able to use mDNS here for ESP32
+      //      https://www.tutorialfor.com/questions-324359.htm
 
 #if defined(ESP_ARDUINO_VERSION) && defined(ESP_ARDUINO_VERSION_VAL)
 #define WM_ARDUINOVERCHECK ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2, 0, 0)
 #endif
 
 #if WM_ARDUINOVERCHECK
-        // Arduino Core 2.x
+      // Arduino Core 2.x
         esp_ip4_addr addr;
 #else
-        // Arduino Core 1.x
+      // Arduino Core 1.x
         struct ip4_addr addr;
 #endif
 
