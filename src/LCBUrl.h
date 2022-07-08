@@ -113,6 +113,7 @@ private:
     String host = "";
     IPAddress ipaddress = INADDR_NONE;
     unsigned int port = 0;
+    String getAuthority(bool ipaddr, String &authority_string);
     String authority = "";
     String ipauthority = "";
     String pathsegment = "";
