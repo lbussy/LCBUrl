@@ -88,11 +88,13 @@ public:
     // Library-accessible "private" interface
 private:
     bool hasEnding(std::string const &fullString, std::string const &ending);
+    String getUrl(bool ipaddr, String &url_string);
     String getRawUrl();
     String getCleanTriplets();
     String getDotSegmentsClear();
     String getStripScheme();
     String getRawAuthority();
+    String getAuthority(bool ipaddr, String &authority_string);
     String getAfterAuth();
     String getPathSegment();
     String getPathSegmentNoFile();
