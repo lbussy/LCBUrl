@@ -263,7 +263,8 @@ String LCBUrl::getAuthority(bool ipaddr, String &authority_string)
         {
             authority_string.concat(F("@"));
         }
-        if (ipaddr) {
+        if (ipaddr)
+        {
             ipaddress = getIP(getHost());
 
             if (ipaddress == (IPAddress)IPADDR_NONE || ipaddress.toString().equalsIgnoreCase("(IP unset)"))
@@ -274,7 +275,9 @@ String LCBUrl::getAuthority(bool ipaddr, String &authority_string)
             {
                 authority_string.concat(ipaddress.toString());
             }
-        } else {
+        }
+        else
+        {
             authority.concat(getHost());
         }
 
