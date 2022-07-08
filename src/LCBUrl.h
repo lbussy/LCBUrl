@@ -100,6 +100,7 @@ private:
     String getAfterPathNoFile();
     void initRegisters();
     String rawurl = "";
+    String getUrl(bool ipaddr, String &url_string);
     String url = "";
     String ipurl = "";
     String workingurl = "";

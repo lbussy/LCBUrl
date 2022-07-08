@@ -64,64 +64,46 @@ bool LCBUrl::setUrl(const String &newUrl)
 
 String LCBUrl::getUrl() // Returned parsed/normalized URL
 {
-    if (url.isEmpty())
-    {
-        url = "";
-        url.concat(getScheme());
-        url.concat(F("://"));
-        url.concat(getAuthority());
-        url.concat(F("/"));
-        if (!getPath().isEmpty())
-        {
-            url.concat(getPath());
-        }
-        if (!getQuery().isEmpty())
-        {
-            url.concat(F("?"));
-            url.concat(getQuery());
-        }
-        if (getFragment() != "")
-        {
-            url.concat(F("#"));
-            url.concat(getFragment());
-        }
-        if ((getScheme() == "") || (getHost() == ""))
-        {
-            return url;
-        }
-    }
-    return url;
+    return getUrl(false, url);
 }
 
 String LCBUrl::getIPUrl() // Return cleaned URL with IP instead of FQDN
 {
-    if (ipurl.isEmpty())
+    return getUrl(true, ipurl);
+}
+
+String LCBUrl::getUrl(bool ipaddr, String &url_string)
+{
+    if (url_string.isEmpty())
     {
-        ipurl = "";
-        ipurl.concat(getScheme());
-        ipurl.concat(F("://"));
-        ipurl.concat(getIPAuthority());
-        ipurl.concat(F("/"));
+        url_string = "";
+        url_string.concat(getScheme());
+        url_string.concat(F("://"));
+        if (ipaddr)
+            url_string.concat(getIPAuthority());
+        else
+            url_string.concat(getAuthority());
+        url_string.concat(F("/"));
         if (!getPath().isEmpty())
         {
-            ipurl.concat(getPath());
+            url_string.concat(getPath());
         }
         if (!getQuery().isEmpty())
         {
-            ipurl.concat(F("?"));
-            ipurl.concat(getQuery());
+            url_string.concat(F("?"));
+            url_string.concat(getQuery());
         }
         if (getFragment() != "")
         {
-            ipurl.concat(F("#"));
-            ipurl.concat(getFragment());
+            url_string.concat(F("#"));
+            url_string.concat(getFragment());
         }
         if ((getScheme() == "") || (getHost() == ""))
         {
-            return ipurl;
+            return url_string;
         }
     }
-    return ipurl;
+    return url_string;
 }
 
 String LCBUrl::getScheme() // Returns URL scheme
