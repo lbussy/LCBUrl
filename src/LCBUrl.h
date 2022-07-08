@@ -100,6 +100,7 @@ private:
     String getAfterPathNoFile();
     void initRegisters();
     String rawurl = "";
+    String getUrl(bool ipaddr, String &url_string);
     String url = "";
     String ipurl = "";
     String workingurl = "";
@@ -113,6 +114,7 @@ private:
     String host = "";
     IPAddress ipaddress = INADDR_NONE;
     unsigned int port = 0;
+    String getAuthority(bool ipaddr, String &authority_string);
     String authority = "";
     String ipauthority = "";
     String pathsegment = "";
