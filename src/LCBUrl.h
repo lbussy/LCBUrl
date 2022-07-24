@@ -69,6 +69,7 @@ public:
     String getAuthority();
     String getIPAuthority();
     String getPath();
+    String getAfterPath();
     String getFileName();
     String getQuery();
     String getFragment();
@@ -98,7 +99,6 @@ private:
     String getAfterAuth();
     String getPathSegment();
     String getPathSegmentNoFile();
-    String getAfterPath();
     String getAfterPathNoFile();
     void initRegisters();
     String rawurl = "";
