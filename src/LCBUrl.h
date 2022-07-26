@@ -69,6 +69,7 @@ public:
     String getAuthority();
     String getIPAuthority();
     String getPath();
+    String getAfterPath()__attribute__((deprecated("This will move to a private function in the next release.  See #42.")));
     String getFileName();
     String getQuery();
     String getFragment();
@@ -98,7 +99,6 @@ private:
     String getAfterAuth();
     String getPathSegment();
     String getPathSegmentNoFile();
-    String getAfterPath();
     String getAfterPathNoFile();
     void initRegisters();
     String rawurl = "";
