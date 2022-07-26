@@ -165,4 +165,4 @@ The library is licensed under the [MIT License](https://github.com/lbussy/LCBUrl
 
 ## Copyright
 
-LCBUrl is Copyright &copy; 2019-2021 by Lee C Bussy.
+LCBUrl is Copyright &copy; 2019-2022 by Lee C Bussy.
