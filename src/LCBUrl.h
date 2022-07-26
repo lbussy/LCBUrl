@@ -68,7 +68,7 @@ public:
     unsigned int getPort();
     String getAuthority();
     String getIPAuthority();
-    String getPath();
+    String getPath()__attribute__((deprecated("This will move to a private function in the next release.  See #42.")));
     String getFileName();
     String getQuery();
     String getFragment();
