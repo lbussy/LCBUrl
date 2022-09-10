@@ -57,7 +57,7 @@ If you are using mDNS in your projects, you may have discovered many microcontro
 
 ### Original Utility Methods
 
-:exclamation: These methods are deprecated and slated to be removed.  Y
+:exclamation: These methods are deprecated and slated to be removed.
 
 These utility methods are dependant upon the class' instantiation and current URL string.
 
