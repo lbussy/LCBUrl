@@ -384,7 +384,14 @@ String LCBUrl::getFragment() // Get all after '#'
 
 bool LCBUrl::hasEnding(std::string const &fullString, std::string const &ending)
 {
-    return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    if (fullString.length() >= ending.length())
+    {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    }
+    else
+    {
+        return false;
+    }
 }
 
 String LCBUrl::getStripScheme() // Remove scheme and "://" discriminately
