@@ -90,7 +90,6 @@ public:
 private:
     bool hasEnding(std::string const &fullString, std::string const &ending);
     String getUrl(bool ipaddr, String &url_string);
-    String getRawUrl();
     String getCleanTriplets();
     String getDotSegmentsClear();
     String getStripScheme();

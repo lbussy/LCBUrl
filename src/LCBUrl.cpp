@@ -729,13 +729,23 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
 #endif
 
         mdns_init();
-        ipaddress = MDNS.queryHost("brewpi", 5000 /* ms */);
+        if (!hasEnding(fqdn, ".local"))
+        {
+            ipaddress = MDNS.queryHost(fqdn, 5000 /* ms */);
+        }
+        else
+        {
+            std::string fqdnString(fqdn);
+            fqdnString = fqdnString.substr(0, fqdnString.find_last_of("."));
+            ipaddress = MDNS.queryHost(fqdnString.c_str(), 5000 /* ms */);
+        }
 
 #endif // ESP32
 #endif // LCBURL_MDNS
     }
     else
-    { // Host is not an mDNS name
+    {
+        // Host is not an mDNS name
         if (WiFi.hostByName(fqdn, returnIP) == 1)
             ipaddress = returnIP;
     }
