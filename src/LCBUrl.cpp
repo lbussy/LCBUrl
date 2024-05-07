@@ -728,7 +728,8 @@ IPAddress LCBUrl::getIP(const char *fqdn) // Return IP address of FQDN (helpful 
     { // Host is an mDNS name
 #ifdef LCBURL_MDNS
 #ifdef ESP8266
-        int result = WiFi.hostByName(fqdn, &returnIP); // TODO: This is broken
+
+        int result = WiFi.hostByName(fqdn, returnIP); // TODO: This may be broken
 
         if (result == 1)
         {
