@@ -31,6 +31,31 @@
 
 #include "LCBUrl.h"
 
+
+// The following defines are in the lwip headers. In Arduino 2.x these headers are included by one
+// of the other upstream libraries -- now they are not. This enables us to use these defines without
+// creating another dependency. These are taken directly from:
+// https://github.com/espressif/esp-lwip/blob/master/src/include/lwip/ip4_addr.h
+#ifndef IPADDR_NONE
+/** 255.255.255.255 */
+#define IPADDR_NONE         ((uint32_t)0xffffffffUL)
+#endif
+
+#ifndef IPADDR_LOOPBACK
+/** 127.0.0.1 */
+#define IPADDR_LOOPBACK     ((uint32_t)0x7f000001UL)
+#endif
+
+#ifndef IPADDR_ANY
+/** 0.0.0.0 */
+#define IPADDR_ANY          ((uint32_t)0x00000000UL)
+#endif
+
+#ifndef IPADDR_BROADCAST
+/** 255.255.255.255 */
+#define IPADDR_BROADCAST    ((uint32_t)0xffffffffUL)
+#endif
+
 // Constructor/Destructor ////////////////////////////////////////////////
 // Handle the creation, setup, and destruction of instances
 
